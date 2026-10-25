@@ -249,3 +249,7 @@ scatter view compares the latest seven complete days against the preceding seven
 requiring at least five valid daily entries per period. Startup adds this new metric
 to existing synthetic demo history without changing its original readings. No real
 VO₂ max sensor or clinical estimation model is connected.
+
+## Data and analysis (for the presentation)
+
+The ECG + motion experiment uses real public data (1,000 PhysioNet CinC 2017 ECG records, 700 Normal / 300 AF, plus real UCI HAPT motion windows). It is a CLI-only, non-diagnostic MVP on branch `feat/stroke-ecg-motion`. Everything a presenter needs (data, results, how to run, troubleshooting, honest limits) is in **[docs/DATA_AND_ANALYSIS.md](docs/DATA_AND_ANALYSIS.md)**.
