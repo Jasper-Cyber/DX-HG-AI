@@ -14,6 +14,7 @@ import Constants from "expo-constants";
 
 import type {
   ApiErrorBody,
+  AlertSummary,
   CareProfile,
   DispatchArgs,
   DispatchEvent,
@@ -171,6 +172,7 @@ export const api = {
   runAnalysis: () => request<RunAnalysisResponse>("/analysis/run", { method: "POST" }),
 
   getInsights: (signal?: AbortSignal) => request<InsightResponse>("/insights", { signal }),
+  getAlertHistory: (signal?: AbortSignal) => request<AlertSummary[]>("/insights/history", { signal }),
 
   // Simulator / scenario
   getScenario: (signal?: AbortSignal) => request<ScenarioState>("/scenario", { signal }),

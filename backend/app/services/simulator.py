@@ -1,75 +1,17 @@
-"""Wearable physiological data simulator (Task 6, Raffy — analytics & simulation engine).
+"""Deterministic synthetic readings for six metrics and scenarios A/B/C.
 
-PURPOSE
--------
-This module generates the *synthetic* physiological time-series that the rest of
-HeartGuardian AI consumes. There is no real hardware in the MVP; every reading the
-app charts, baselines, and alerts on originates here. The service produces readings
-for all six metric types (HR, HRV, SpO2, rhythm flag, activity, sleep) under three
-selectable scenarios and persists them through the repository layer. (Req 2.1, 2.9)
+The HTTP simulator uses ``advance`` through services.monitoring: a fresh run
+creates demo history, then a lifespan worker appends hourly ticks on an accelerated
+clock. The persisted cursor prevents replay on resume; the first reading anchors
+run-relative drift so chunking does not change the generated signal.
 
-INTEGRATION CONTRACT (with the Task 8 router, backend/app/routers/simulator.py)
-------------------------------------------------------------------------------
-The control router owns the simulator *session state* (the single ``sim_state`` row)
-and calls this service through an optional seam:
+``generate`` is the fixed-count, fixed-epoch API used by the seed script and for
+reproducible standalone datasets. ``start`` is the legacy wall-clock backfill API.
+Neither creates its own timer. ``pause`` and ``reset`` update persisted state;
+reset clears current readings and analysis while retaining historical alerts.
 
-    from ..services.simulator import SimulatorService
-    sim = SimulatorService()   # MUST be constructible with no arguments
-    sim.start()                # POST /simulator/start
-    sim.pause()                # POST /simulator/pause
-    sim.reset()                # POST /simulator/reset
-
-So ``SimulatorService()`` takes no args and exposes ``start() / pause() / reset()``.
-``select_scenario(scenario)`` is also provided for Scenario-select (Req 2.6). The
-router persists its own status transitions too; this service reads and writes the
-same ``sim_state`` row via the repository, so both sides stay consistent and
-idempotent. This service never touches the router or the repository internals — it
-only calls the public repository functions.
-
-DESIGN: ON-DEMAND BATCH GENERATION (no background threads/timers)
------------------------------------------------------------------
-A hackathon demo should be deterministic and thread-free. Instead of a timer that
-drips readings in real time, ``start()`` synchronously generates a *batch* of ticks
-that advance ``cursor_ts`` from where it left off up to "now", then marks the session
-running. This keeps generation reproducible and easy to test.
-
-- ``start()``  : mark running; generate a batch of ticks from the stored cursor up to
-                 "now"; persist readings; advance cursor_ts. On a fresh/reset session
-                 (cursor_ts is None) the cursor is seeded to the current tick boundary,
-                 so a first ``start()`` with no elapsed time generates nothing and the
-                 session fills in as time advances (or as a caller seeds cursor_ts into
-                 the past to backfill a demo history).
-- ``pause()``  : mark paused; generate nothing.
-- ``reset()``  : clear generated readings, reset cursor_ts to None, keep the selected
-                 scenario, and return to the paused start state (Req 2.7).
-- ``select_scenario(s)`` : persist the chosen scenario (A/B/C) (Req 2.6).
-
-SCENARIO B DRIFT IS RUN-RELATIVE
---------------------------------
-Scenario B's trend is measured from the *run's first generated tick*, not from an
-absolute epoch, so "over simulated weeks" means weeks since the run began. The run
-anchor is derived deterministically from the start cursor, keeping B reproducible
-while the per-tick RNG still keys on the absolute tick index.
-
-REPRODUCIBILITY (Req 2.8)
--------------------------
-Randomness comes from ``numpy.random.default_rng``. Crucially, the RNG is re-seeded
-*per tick* from a deterministic combination of (seed, scenario, tick-index), not from
-one long-lived generator. That makes the k-th reading in a run depend only on the seed
-and scenario — never on how the batch happened to be chunked across multiple
-``start()`` calls. Same seed + same scenario => byte-identical sequences.
-
-KNOWN LIMITATIONS / ASSUMPTIONS
--------------------------------
-- Tick cadence is a fixed simulated hour (``TICK``). Scenario B's "over simulated
-  weeks" drift is expressed across the tick index, so a batch that spans many ticks
-  shows the trend; a tiny batch shows only its beginning.
-- "now" is real wall-clock UTC; on a fresh session we seed cursor_ts to a window in
-  the past (``INITIAL_HISTORY``) so there is immediately some history to analyze.
-- The physiological numbers are plausible-looking, not clinically calibrated. They
-  exist to exercise the analysis/alert pipeline, not to model real cardiology.
-- A hard cap (``MAX_TICKS_PER_START``) bounds how much a single ``start()`` generates
-  so an idle session that is resumed much later cannot create an unbounded batch.
+Randomness is seeded per tick from (seed, scenario, absolute tick index).
+These values exercise the prototype and are not clinically calibrated.
 """
 from __future__ import annotations
 
@@ -187,13 +129,27 @@ class SimulatorService:
             )
         return rows
 
+    def advance(self, steps: int = 1) -> SimState:
+        """Append simulated hours, preserving the cursor and run-relative drift."""
+        state = repo.get_sim_state()
+        existing = repo.query_measurements(user_id=self.user_id, limit=1)
+        anchor = self._parse_iso(existing[0].timestamp) if existing else self._EPOCH_ANCHOR
+        start = self._parse_iso(state.cursor_ts) if state.cursor_ts else anchor
+        rows, cursor = self._generate_batch(
+            scenario=state.scenario, seed=state.seed, start_ts=start,
+            until=start + steps * TICK, run_anchor_index=self._tick_index(anchor),
+        )
+        if rows:
+            repo.insert_measurements(rows)
+            return repo.update_sim_state(cursor_ts=cursor.isoformat())
+        return state
+
     def start(self) -> SimState:
         """Mark the session running and generate a batch of readings up to now.
 
-        On a fresh/reset session (cursor_ts is None) generation starts
-        ``INITIAL_HISTORY`` in the past so the app immediately has history. On a
-        resumed session it continues from the stored cursor. The batch is capped
-        at ``MAX_TICKS_PER_START`` ticks. (Req 2.6)
+        A fresh session has no completed ticks and generates nothing. A resumed
+        session continues from its stored cursor, capped at MAX_TICKS_PER_START.
+        The HTTP demo uses advance() instead of this wall-clock backfill API.
         """
         state = repo.get_sim_state()
 
@@ -232,12 +188,12 @@ class SimulatorService:
         """Clear generated readings and return to the scenario's start state.
 
         Keeps the selected scenario and seed, drops all readings for the user, and
-        resets cursor_ts to None so the next ``start()`` begins a fresh run from the
-        seeded history window. Ends in the paused state. (Req 2.7)
+        resets cursor_ts to None so the next demo start begins a fresh dataset.
+        Ends in the paused state. (Req 2.7)
         """
         repo.clear_measurements(user_id=self.user_id)
-        # cursor_ts cannot be set back to NULL through update_sim_state's patch
-        # semantics (None means "leave unchanged"), so reset it explicitly.
+        repo.clear_current_analysis(user_id=self.user_id)
+        # Return to the beginning of the selected scenario.
         self._reset_cursor_to_null()
         return repo.update_sim_state(status="paused")
 

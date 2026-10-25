@@ -252,3 +252,19 @@ def test_missing_and_low_quality_samples_appear(sim_env):
             assert r.value is None
         else:
             assert r.value is not None
+
+
+def test_advance_is_identical_across_chunks(sim_env):
+    sim_mod, repo = sim_env
+    sim = sim_mod.SimulatorService()
+    sim.select_scenario('B')
+    expected = sim.generate(steps=48, persist=False)
+    sim.advance(24)
+    cursor = repo.get_sim_state().cursor_ts
+    sim.advance(24)
+    actual = repo.query_measurements()
+    key = lambda r: (r.timestamp, r.metric_type)
+    values = lambda rows: [(r.timestamp, r.metric_type, r.value, r.quality)
+                           for r in sorted(rows, key=key)]
+    assert values(actual) == values(expected)
+    assert repo.get_sim_state().cursor_ts > cursor

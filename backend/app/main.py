@@ -10,6 +10,7 @@ experimental. The service does not diagnose conditions and is not a medical devi
 """
 from __future__ import annotations
 
+import asyncio
 from contextlib import asynccontextmanager
 
 from fastapi import FastAPI
@@ -27,7 +28,15 @@ async def lifespan(_app: FastAPI):
     from .db.seed_providers import seed_providers
 
     seed_providers()
-    yield
+    from .services.monitoring import run
+
+    stop = asyncio.Event()
+    worker = asyncio.create_task(run(stop))
+    try:
+        yield
+    finally:
+        stop.set()
+        await worker
 
 
 app = FastAPI(

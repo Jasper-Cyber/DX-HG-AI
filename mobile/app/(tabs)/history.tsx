@@ -3,7 +3,7 @@ import { ActivityIndicator, Pressable, ScrollView, StyleSheet, Text, View } from
 import { SafeAreaView } from "react-native-safe-area-context";
 
 import type { TrendRange } from "@/api/types";
-import { useInsights, useTrends } from "@/api/hooks";
+import { useAlertHistory, useTrends } from "@/api/hooks";
 import { PastAlertsList } from "@/components/PastAlertsList";
 import { RangeToggle } from "@/components/RangeToggle";
 import { SimulatedDataRibbon } from "@/components/SimulatedDataRibbon";
@@ -20,24 +20,10 @@ import { theme } from "@/theme";
 export default function HistoryScreen() {
   const [range, setRange] = useState<TrendRange>("daily");
   const trends = useTrends(range);
-  const insights = useInsights();
-
+  const history = useAlertHistory();
   const series = trends.data?.series ?? [];
-  // The backend currently exposes only the current insight (no past-alerts
-  // history endpoint yet), so there is no alert history to show. If the
-  // current insight is non-normal, surface it as the single recent entry.
-  const pastAlerts =
-    insights.data && insights.data.state !== "normal"
-      ? [
-          {
-            state: insights.data.state,
-            title: insights.data.title,
-            createdAt: undefined,
-          },
-        ]
-      : [];
   const isLoading = trends.isLoading && !trends.data;
-  const isEmpty = !isLoading && !trends.isError && series.length === 0;
+  const isEmpty = !isLoading && !trends.isError && series.every((s) => s.points.length === 0);
 
   return (
     <SafeAreaView style={styles.safe} edges={["top"]}>
@@ -71,7 +57,16 @@ export default function HistoryScreen() {
 
         <Text style={styles.sectionLabel}>Past alerts</Text>
         <View style={styles.card}>
-          <PastAlertsList alerts={pastAlerts} />
+          {history.isLoading ? (
+            <ActivityIndicator color={theme.colors.accent} />
+          ) : history.isError ? (
+            <>
+              <Text style={styles.errorTitle}>Couldn’t load alert history</Text>
+              <Pressable style={styles.retry} onPress={() => history.refetch()} accessibilityRole="button">
+                <Text style={styles.retryText}>Retry</Text>
+              </Pressable>
+            </>
+          ) : <PastAlertsList alerts={history.data ?? []} />}
         </View>
       </ScrollView>
     </SafeAreaView>

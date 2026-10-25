@@ -50,6 +50,21 @@ from ..services import alerts as alert_service
 router = APIRouter(prefix="/insights", tags=["insights"])
 
 
+class AlertSummaryOut(BaseModel):
+    id: int
+    state: str
+    title: str
+    createdAt: str
+
+
+@router.get("/history", response_model=list[AlertSummaryOut])
+def get_history(limit: int = Query(default=100, ge=1, le=1000)):
+    from ..db import repository as repo
+
+    return [AlertSummaryOut(id=a.id, state=a.state, title=a.title, createdAt=a.created_at)
+            for a in repo.list_alerts(limit=limit)]
+
+
 class FindingOut(BaseModel):
     """A supporting anomaly finding, serialized for the client (camelCase)."""
 
