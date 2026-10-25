@@ -86,3 +86,26 @@ describe("hasUsableValue", () => {
     expect(hasUsableValue(undefined)).toBe(false);
   });
 });
+
+import { readingsInWindow, summarizeMetric } from "@/utils/metrics";
+
+describe("measurement summaries", () => {
+  it("uses the simulation clock and a trailing 24-hour window", () => {
+    const rows = [reading({ timestamp: "2026-01-01T00:00:00Z" }), reading({ timestamp: "2026-01-01T01:00:00Z" }), reading({ timestamp: "2026-01-02T00:00:00Z" })];
+    expect(readingsInWindow(rows, 24)).toEqual(rows.slice(1));
+    expect(readingsInWindow(rows, null)).toEqual(rows);
+  });
+  it("excludes unusable samples from statistics but retains the gaps", () => {
+    const rows = [reading({ value: 60 }), reading({ value: 80 }), reading({ value: 200, quality: "low" }), reading({ value: null, quality: "missing" }), reading({ value: Infinity })];
+    const summary = summarizeMetric(rows, "hr");
+    expect(summary).toMatchObject({ min: 60, mean: 70, max: 80, validCount: 2, totalCount: 5 });
+    expect(miniSeriesForMetric(rows, "hr")).toEqual([60, 80, null, null, null]);
+  });
+  it("does not invent values for an empty window", () => {
+    expect(summarizeMetric([], "hr")).toMatchObject({ min: null, mean: null, max: null, validCount: 0 });
+  });
+  it("counts rhythm flags only among valid observations", () => {
+    const rows = [reading({ metricType: "rhythm", value: 1 }), reading({ metricType: "rhythm", value: 0 }), reading({ metricType: "rhythm", value: 1, quality: "low" })];
+    expect(summarizeMetric(rows, "rhythm")).toMatchObject({ flagged: 1, validCount: 2, totalCount: 3 });
+  });
+});

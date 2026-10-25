@@ -62,13 +62,13 @@ def _series(rows, metric):
 # Generation basics (Req 2.1, 2.9)
 # --------------------------------------------------------------------------- #
 
-def test_start_generates_all_six_metrics_tagged_synthetic(sim_env):
+def test_start_generates_all_metrics_tagged_synthetic(sim_env):
     sim_mod, repo = sim_env
     rows = _run(repo, sim_mod, scenario="A")
 
     assert len(rows) > 0
     metrics = {r.metric_type for r in rows}
-    assert metrics == {"hr", "hrv", "spo2", "rhythm", "activity", "sleep"}
+    assert metrics == {"hr", "hrv", "spo2", "rhythm", "activity", "sleep", "vo2max"}
     assert all(r.is_synthetic for r in rows)
     assert all(r.scenario == "A" for r in rows)
 
@@ -268,3 +268,26 @@ def test_advance_is_identical_across_chunks(sim_env):
                            for r in sorted(rows, key=key)]
     assert values(actual) == values(expected)
     assert repo.get_sim_state().cursor_ts > cursor
+
+
+def test_vo2_is_daily_synthetic_and_backfill_is_idempotent(sim_env):
+    sim_mod, repo = sim_env
+    from app.db.models import Measurement
+
+    sim = sim_mod.SimulatorService()
+    generated = sim.generate(steps=48, persist=False)
+    expected_vo2 = [r for r in generated if r.metric_type == 'vo2max']
+    assert len(expected_vo2) == 2
+    assert all(r.is_synthetic and 'T00:00:00' in r.timestamp for r in expected_vo2)
+    assert all(r.value is None or 15 <= r.value <= 80 for r in expected_vo2)
+    # Reproduce a database created before VO2 support, including alternate ISO notation.
+    old = [r for r in generated if r.metric_type != 'vo2max']
+    for row in old:
+        row.timestamp = row.timestamp.replace('+00:00', 'Z')
+    repo.insert_measurements(old)
+    repo.insert_measurement(Measurement(timestamp='2026-01-03T00:00:00Z', metric_type='hr', value=60, is_synthetic=False))
+    assert sim.backfill_vo2() == 2
+    assert sim.backfill_vo2() == 0
+    actual = repo.query_measurements(metric_type='vo2max')
+    assert [(r.timestamp, r.value, r.quality) for r in actual] == [(r.timestamp, r.value, r.quality) for r in expected_vo2]
+    assert repo.count_measurements() == len(old) + 3

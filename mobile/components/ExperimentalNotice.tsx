@@ -23,10 +23,10 @@ export function ExperimentalNotice() {
 const styles = StyleSheet.create({
   wrap: {
     borderWidth: 1,
-    borderColor: theme.colors.experimental,
+    borderColor: theme.colors.inset,
     borderRadius: theme.radius.sm,
-    backgroundColor: theme.colors.surfaceAlt,
+    backgroundColor: theme.colors.inset,
     padding: theme.spacing(3),
   },
-  text: { color: theme.colors.experimental, fontSize: theme.font.caption, lineHeight: 18 },
+  text: { color: theme.colors.experimental, fontFamily: theme.type.mono, fontSize: theme.font.caption, lineHeight: 18 },
 });

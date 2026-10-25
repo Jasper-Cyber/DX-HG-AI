@@ -20,5 +20,5 @@ export function SimulatedDispatchBadge({ channel }: { channel: DispatchChannel }
 
 const styles = StyleSheet.create({
   badge: { borderWidth: 1, borderRadius: theme.radius.sm, paddingHorizontal: theme.spacing(2), paddingVertical: 2, alignSelf: "flex-start" },
-  text: { fontSize: theme.font.caption, fontWeight: "700", letterSpacing: 0.5 },
+  text: { fontFamily: theme.type.mono, fontSize: theme.font.caption, fontWeight: "700", letterSpacing: 0.5 },
 });

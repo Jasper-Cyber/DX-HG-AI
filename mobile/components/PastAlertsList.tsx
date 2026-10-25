@@ -40,10 +40,10 @@ function formatTime(iso: string): string {
 
 const styles = StyleSheet.create({
   list: { gap: theme.spacing(2) },
-  row: { flexDirection: "row", alignItems: "center", gap: theme.spacing(3) },
+  row: { padding: 12, borderRadius: 10, backgroundColor: theme.colors.surfaceAlt, flexDirection: "row", alignItems: "center", gap: theme.spacing(3) },
   dot: { width: 10, height: 10, borderRadius: 5 },
   rowText: { flex: 1 },
-  title: { color: theme.colors.textPrimary, fontSize: theme.font.body },
-  time: { color: theme.colors.textSecondary, fontSize: theme.font.caption },
-  empty: { color: theme.colors.textSecondary, fontSize: theme.font.body },
+  title: { color: theme.colors.textPrimary, fontFamily: theme.type.body, fontSize: 11 },
+  time: { color: theme.colors.textSecondary, fontFamily: theme.type.mono, fontSize: 11, marginTop: 5 },
+  empty: { color: theme.colors.textSecondary, fontFamily: theme.type.body, fontSize: 11 },
 });

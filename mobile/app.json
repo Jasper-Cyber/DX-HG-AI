@@ -4,19 +4,19 @@
     "slug": "heartguardian-ai",
     "version": "0.1.0",
     "orientation": "portrait",
-    "userInterfaceStyle": "dark",
+    "userInterfaceStyle": "light",
     "scheme": "heartguardian",
     "newArchEnabled": true,
     "splash": {
       "resizeMode": "contain",
-      "backgroundColor": "#0A1628"
+      "backgroundColor": "#ECEAE3"
     },
     "ios": {
       "supportsTablet": true
     },
     "android": {
       "adaptiveIcon": {
-        "backgroundColor": "#0A1628"
+        "backgroundColor": "#ECEAE3"
       }
     },
     "web": {

@@ -198,3 +198,28 @@ Place demo screenshots in `docs/screenshots/` and reference them here, e.g.:
 
 Built with Amazon Kiro using spec-driven development. The requirements, design, and task plan live
 in `.kiro/specs/heartguardian-ai/`. See `TEAM.md` for ownership and the branch-per-task workflow.
+
+### Trend exploration
+
+Health cards expand into weekly/monthly daily-average bars with min–max ranges,
+selectable dates, and a history summary. Insights compares the latest seven complete
+UTC days with the preceding seven. These windows use the simulator clock and exclude
+the current partial day; comparisons require at least 12 usable hourly samples on
+every day in both windows.
+
+The forecast panel is an **experimental numerical extrapolation**, not a clinical
+prediction or disease-risk score. It fits a straight line to the latest seven daily
+means (at least four adequately sampled days, including the most recent complete
+day) and estimates the next day's mean. Invalid or physically impossible estimates
+are withheld. Missing and low-quality data are excluded from calculations.
+
+Heart-rate details include a UTC intraday trace and a seven-day chart with separate
+minimum (purple), average (blue), and maximum (pink) markers. Today is explicitly
+partial; invalid readings are excluded, and days with no usable data stay blank.
+
+VO₂ max is a separate **daily synthetic demo metric** (`vo2max`, mL/kg/min), not
+inferred from heart rate or SpO₂ and not used by the alert detectors. Its 28/90-day
+scatter view compares the latest seven complete days against the preceding seven,
+requiring at least five valid daily entries per period. Startup adds this new metric
+to existing synthetic demo history without changing its original readings. No real
+VO₂ max sensor or clinical estimation model is connected.

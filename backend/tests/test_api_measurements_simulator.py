@@ -106,14 +106,14 @@ def test_resume_and_tick_append_without_duplicates(client):
     c.post('/simulator/start')
     assert repo.count_measurements() == first_count
     tick()
-    assert repo.count_measurements() == first_count + 6
+    assert repo.count_measurements() == first_count + 7
     c.post('/simulator/pause')
     tick()
-    assert repo.count_measurements() == first_count + 6
+    assert repo.count_measurements() == first_count + 7
     resumed = c.post('/simulator/start').json()
     assert resumed['cursorTs'] > initial['cursorTs']
     rows = repo.query_measurements()
-    assert len(rows) == first_count + 12
+    assert len(rows) == first_count + 13
     assert len({(r.timestamp, r.metric_type) for r in rows}) == len(rows)
     assert c.get('/insights/history').json()
 
@@ -187,4 +187,38 @@ def test_background_worker_advances_and_stops(client, monkeypatch):
         await asyncio.wait_for(monitoring.run(stop), timeout=10)
 
     asyncio.run(exercise())
-    assert repo.count_measurements() == count + 6
+    assert repo.count_measurements() == count + 7
+
+
+def test_trends_exclude_low_quality_samples_and_keep_empty_periods(client):
+    c, repo = client
+    from app.db.models import Measurement
+
+    repo.insert_measurements([
+        Measurement(timestamp='2026-01-01T00:00:00+00:00', metric_type='hr', value=60),
+        Measurement(timestamp='2026-01-01T01:00:00+00:00', metric_type='hr', value=80),
+        Measurement(timestamp='2026-01-01T02:00:00+00:00', metric_type='hr', value=200, quality='low'),
+        Measurement(timestamp='2026-01-02T00:00:00+00:00', metric_type='hr', value=200, quality='low'),
+    ])
+    points = c.get('/trends', params={'metric': 'hr'}).json()['series'][0]['points']
+    assert points[0]['mean'] == 70
+    assert points[0]['min'] == 60
+    assert points[0]['max'] == 80
+    assert points[0]['count'] == 2
+    assert points[1]['mean'] is None
+    assert points[1]['count'] == 0
+
+
+def test_vo2_measurements_and_trends_are_available_without_alert_escalation(client):
+    c, repo = client
+    c.post('/simulator/start')
+    readings = c.get('/measurements', params={'metric': 'vo2max'}).json()['items']
+    assert len(readings) == 21
+    assert all(r['metricType'] == 'vo2max' and r['isSynthetic'] for r in readings)
+    response = c.get('/trends', params={'metric': 'vo2max', 'range': 'daily'})
+    assert response.status_code == 200
+    series = response.json()['series'][0]
+    assert series['metric'] == 'vo2max'
+    assert len(series['points']) == 21
+    assert all(p['count'] in (0, 1) for p in series['points'])
+    assert not any(f.metric_type == 'vo2max' for f in repo.list_findings())

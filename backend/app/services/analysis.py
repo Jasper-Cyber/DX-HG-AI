@@ -99,7 +99,7 @@ _BASELINE_METRICS: tuple[MetricType, ...] = ("hr", "hrv", "spo2")
 # for /trends iteration + metric validation, but this module only defined the
 # private ``_BASELINE_METRICS``. Parallel PRs merged with mismatched names and broke
 # the import of ``app.main``. Expose the public name without changing any logic.
-NUMERIC_METRICS: tuple[MetricType, ...] = _BASELINE_METRICS
+NUMERIC_METRICS: tuple[MetricType, ...] = (*_BASELINE_METRICS, "vo2max")
 
 # Severity bands ordered weakest -> strongest; used by the guardrail downgrade.
 _SEVERITY_ORDER: tuple[str, ...] = ("info", "review", "attention")

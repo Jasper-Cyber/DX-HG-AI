@@ -15,7 +15,7 @@ from ..db.models import Measurement
 
 router = APIRouter(prefix="/measurements", tags=["measurements"])
 
-_VALID_METRICS = {"hr", "hrv", "spo2", "rhythm", "activity", "sleep"}
+_VALID_METRICS = {"hr", "hrv", "spo2", "rhythm", "activity", "sleep", "vo2max"}
 
 
 class MeasurementOut(BaseModel):
@@ -48,7 +48,7 @@ class MeasurementsResponse(BaseModel):
 
 @router.get("", response_model=MeasurementsResponse)
 def get_measurements(
-    metric: Optional[str] = Query(default=None, description="hr|hrv|spo2|rhythm|activity|sleep"),
+    metric: Optional[str] = Query(default=None, description="hr|hrv|spo2|rhythm|activity|sleep|vo2max"),
     from_: Optional[str] = Query(default=None, alias="from", description="ISO-8601 start (inclusive)"),
     to: Optional[str] = Query(default=None, description="ISO-8601 end (inclusive)"),
     limit: Optional[int] = Query(default=None, ge=1, le=10000),

@@ -78,7 +78,7 @@ def get_trends(
             df = pd.DataFrame(
                 {
                     "ts": pd.to_datetime([r.timestamp for r in rows], utc=True),
-                    "value": [r.value for r in rows],
+                    "value": [r.value if r.quality == "ok" else None for r in rows],
                 }
             ).set_index("ts")
             grouped = df["value"].resample(rule)

@@ -6,17 +6,18 @@
  */
 import type { MetricType, Quality, Reading } from "@/api/types";
 
-/** Display metadata per metric: label, unit, and the theme color key for accents. */
+/** Display metadata per metric: label and unit. Metric colors live in the shared theme. */
 export const METRIC_META: Record<
   MetricType,
-  { label: string; unit: string; colorKey: "accent" | "accentGreen" | "warn" | "danger" | "experimental" }
+  { label: string; unit: string }
 > = {
-  hr: { label: "Heart Rate", unit: "bpm", colorKey: "accent" },
-  hrv: { label: "HRV", unit: "ms", colorKey: "accentGreen" },
-  spo2: { label: "Blood Oxygen", unit: "%", colorKey: "accent" },
-  rhythm: { label: "Rhythm", unit: "", colorKey: "warn" },
-  activity: { label: "Activity", unit: "steps", colorKey: "accentGreen" },
-  sleep: { label: "Sleep", unit: "h", colorKey: "accent" },
+  vo2max: { label: "VO₂ max", unit: "mL/kg/min" },
+  hr: { label: "Heart Rate", unit: "bpm" },
+  hrv: { label: "HRV", unit: "ms" },
+  spo2: { label: "Blood Oxygen", unit: "%" },
+  rhythm: { label: "Rhythm", unit: "" },
+  activity: { label: "Activity", unit: "steps" },
+  sleep: { label: "Sleep", unit: "h" },
 };
 
 /** The four metrics shown as primary cards on the dashboard, in order. */
@@ -42,6 +43,7 @@ export function formatMetricValue(value: number | null, metric: MetricType): str
     case "hr":
     case "activity":
       return `${Math.round(value)}`;
+    case "vo2max":
     case "sleep":
       return value.toFixed(1);
     default:
@@ -94,10 +96,41 @@ export function miniSeriesForMetric(
     .filter((r) => r.metricType === metric)
     .sort((a, b) => (a.timestamp < b.timestamp ? -1 : a.timestamp > b.timestamp ? 1 : 0));
   const tail = forMetric.slice(-limit);
-  return tail.map((r) => r.value);
+  return tail.map((r) => hasUsableValue(r) ? r.value : null);
 }
 
 /** Whether a reading represents usable data (not missing/low). */
 export function hasUsableValue(reading: Reading | undefined): boolean {
-  return !!reading && reading.value !== null && reading.quality === "ok";
+  return !!reading && reading.value !== null && Number.isFinite(reading.value) && reading.quality === "ok";
+}
+
+/** A trailing window on the simulation's clock, not the device's real date. */
+export function readingsInWindow(readings: Reading[], hours: number | null): Reading[] {
+  const dated = readings.filter(r => Number.isFinite(Date.parse(r.timestamp)));
+  if (hours === null || !dated.length) return dated;
+  const end = Math.max(...dated.map(r => Date.parse(r.timestamp)));
+  return dated.filter(r => Date.parse(r.timestamp) > end - hours * 3_600_000);
+}
+
+/** Descriptive statistics exclude missing, low-quality, and non-finite samples. */
+export function summarizeMetric(readings: Reading[], metric: MetricType) {
+  const rows = readings.filter(r => r.metricType === metric)
+    .sort((a, b) => Date.parse(a.timestamp) - Date.parse(b.timestamp));
+  const valid = rows.filter(hasUsableValue);
+  const values = valid.map(r => r.value!);
+  return {
+    rows, validCount: valid.length, totalCount: rows.length,
+    min: values.length ? Math.min(...values) : null,
+    max: values.length ? Math.max(...values) : null,
+    mean: values.length ? values.reduce((sum, v) => sum + v, 0) / values.length : null,
+    flagged: metric === "rhythm" ? values.filter(v => v !== 0).length : 0,
+    first: rows[0]?.timestamp,
+    last: rows[rows.length - 1]?.timestamp,
+  };
+}
+
+export function formatSampleTime(timestamp?: string): string {
+  if (!timestamp || !Number.isFinite(Date.parse(timestamp))) return "No timestamp";
+  const date = new Date(timestamp);
+  return `${date.toISOString().slice(0, 10)} · ${date.toISOString().slice(11, 16)} UTC`;
 }

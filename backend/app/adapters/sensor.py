@@ -100,10 +100,10 @@ class SensorAdapter(Protocol):
         ...
 
 
-# The six metric types, mirrored from the simulator so read_latest() with no
+# The supported metric types, mirrored from the simulator so read_latest() with no
 # metric can iterate them. Kept local (not imported from the service) so this
 # adapter does not depend on the service module just for a constant.
-_METRICS: tuple[MetricType, ...] = ("hr", "hrv", "spo2", "rhythm", "activity", "sleep")
+_METRICS: tuple[MetricType, ...] = ("hr", "hrv", "spo2", "rhythm", "activity", "sleep", "vo2max")
 
 
 class SimulatedSensorAdapter:

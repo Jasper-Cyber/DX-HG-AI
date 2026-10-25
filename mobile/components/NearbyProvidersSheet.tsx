@@ -76,12 +76,12 @@ export function NearbyProvidersSheet({
 const styles = StyleSheet.create({
   container: { gap: theme.spacing(2) },
   header: { gap: 2 },
-  title: { color: theme.colors.textPrimary, fontSize: theme.font.h2, fontWeight: "700" },
-  synthetic: { color: theme.colors.experimental, fontSize: theme.font.caption, fontWeight: "600" },
-  approx: { color: theme.colors.warn, fontSize: theme.font.caption },
+  title: { color: theme.colors.textPrimary, fontFamily: theme.type.heading, fontSize: theme.font.h2, fontWeight: "700" },
+  synthetic: { color: theme.colors.experimental, fontFamily: theme.type.mono, fontSize: theme.font.caption, fontWeight: "600" },
+  approx: { color: theme.colors.warn, fontFamily: theme.type.mono, fontSize: theme.font.caption },
   loader: { marginVertical: theme.spacing(4) },
-  error: { color: theme.colors.danger, fontSize: theme.font.body },
-  empty: { color: theme.colors.textSecondary, fontSize: theme.font.body },
+  error: { color: theme.colors.danger, fontFamily: theme.type.body, fontSize: theme.font.body },
+  empty: { color: theme.colors.textSecondary, fontFamily: theme.type.body, fontSize: theme.font.body },
   list: { gap: theme.spacing(2) },
   sep: { height: theme.spacing(2) },
 });

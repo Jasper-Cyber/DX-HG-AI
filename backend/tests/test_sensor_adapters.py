@@ -95,7 +95,7 @@ def test_simulated_adapter_reads_simulator_history(adapter_env):
     assert len(rows) == repo.count_measurements()
     assert all(r.is_synthetic for r in rows)
     metrics = {r.metric_type for r in rows}
-    assert metrics == {"hr", "hrv", "spo2", "rhythm", "activity", "sleep"}
+    assert metrics == {"hr", "hrv", "spo2", "rhythm", "activity", "sleep", "vo2max"}
 
 
 def test_simulated_adapter_read_is_ordered_oldest_first(adapter_env):
@@ -133,8 +133,8 @@ def test_simulated_adapter_read_latest_all_metrics(adapter_env):
 
     # One latest reading per metric type that has data.
     metrics = {r.metric_type for r in latest}
-    assert metrics == {"hr", "hrv", "spo2", "rhythm", "activity", "sleep"}
-    assert len(latest) == 6
+    assert metrics == {"hr", "hrv", "spo2", "rhythm", "activity", "sleep", "vo2max"}
+    assert len(latest) == 7
 
 
 def test_simulated_adapter_read_latest_empty_when_no_data(adapter_env):

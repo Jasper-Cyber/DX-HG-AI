@@ -51,8 +51,8 @@ export function DisclaimerModal({ showAck = true, onAcknowledge, acknowledging }
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: theme.colors.bg },
   content: { padding: theme.spacing(5), gap: theme.spacing(4) },
-  title: { color: theme.colors.textPrimary, fontSize: theme.font.h1, fontWeight: "700" },
-  paragraph: { color: theme.colors.textPrimary, fontSize: theme.font.body, lineHeight: 24 },
+  title: { color: theme.colors.textPrimary, fontFamily: theme.type.heading, fontSize: theme.font.h1, fontWeight: "700" },
+  paragraph: { color: theme.colors.textPrimary, fontFamily: theme.type.body, fontSize: theme.font.body, lineHeight: 24 },
   ack: {
     margin: theme.spacing(4),
     backgroundColor: theme.colors.accent,
@@ -61,5 +61,5 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   ackDisabled: { opacity: 0.5 },
-  ackText: { color: theme.colors.bg, fontSize: theme.font.body, fontWeight: "800" },
+  ackText: { color: theme.colors.onAccent, fontFamily: theme.type.body, fontSize: theme.font.body, fontWeight: "800" },
 });

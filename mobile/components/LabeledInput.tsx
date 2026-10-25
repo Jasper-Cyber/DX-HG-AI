@@ -39,17 +39,17 @@ export function LabeledInput({
 
 const styles = StyleSheet.create({
   field: { gap: theme.spacing(1) },
-  label: { color: theme.colors.textSecondary, fontSize: theme.font.caption, fontWeight: "600" },
+  label: { color: theme.colors.textSecondary, fontFamily: theme.type.mono, fontSize: theme.font.caption, fontWeight: "600" },
   input: {
     backgroundColor: theme.colors.bg,
     borderWidth: 1,
-    borderColor: theme.colors.border,
+    borderColor: theme.colors.controlBorder,
     borderRadius: theme.radius.sm,
     paddingVertical: theme.spacing(2),
     paddingHorizontal: theme.spacing(3),
     color: theme.colors.textPrimary,
-    fontSize: theme.font.body,
+    fontFamily: theme.type.body, fontSize: theme.font.body,
   },
   inputError: { borderColor: theme.colors.danger },
-  error: { color: theme.colors.danger, fontSize: theme.font.caption },
+  error: { color: theme.colors.danger, fontFamily: theme.type.mono, fontSize: theme.font.caption },
 });
