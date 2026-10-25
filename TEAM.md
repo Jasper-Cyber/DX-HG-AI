@@ -1,4 +1,9 @@
-# Team & Workflow — HeartGuardian AI
+# Team & Workflow — HeartGuardian AI (DX Competition)
+
+> 📌 **This is the active repository: `DX-HG-AI`.**
+> The team has moved here for the DX competition. Clone **this** repo and do all new work here.
+> The previous `HeartGuardianAI` repo is now archived/read-only — **do not push to it.**
+> Repo: https://github.com/Jasper-Cyber/DX-HG-AI
 
 This file is the team's coordination guide. The single source of truth for *what to build* is
 [`.kiro/specs/heartguardian-ai/tasks.md`](.kiro/specs/heartguardian-ai/tasks.md); this file says
@@ -19,8 +24,8 @@ Install these once. Versions below are what the project is scaffolded against (n
 
 ### 1. Clone and enter the repo
 ```bash
-git clone https://github.com/Jasper-Cyber/HeartGuardianAI.git
-cd HeartGuardianAI
+git clone https://github.com/Jasper-Cyber/DX-HG-AI.git
+cd DX-HG-AI
 ```
 
 ### 2. Run the backend (FastAPI)
