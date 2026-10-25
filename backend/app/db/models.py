@@ -8,7 +8,7 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import Literal, Optional
 
-MetricType = Literal["hr", "hrv", "spo2", "rhythm", "activity", "sleep"]
+MetricType = Literal["hr", "hrv", "spo2", "rhythm", "activity", "sleep", "vo2max"]
 Quality = Literal["ok", "low", "missing"]
 Scenario = Literal["A", "B", "C"]
 SeverityBand = Literal["info", "review", "attention"]

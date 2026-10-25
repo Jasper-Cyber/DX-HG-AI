@@ -13,7 +13,7 @@
 // Core enums
 // ---------------------------------------------------------------------------
 
-export type MetricType = "hr" | "hrv" | "spo2" | "rhythm" | "activity" | "sleep";
+export type MetricType = "hr" | "hrv" | "spo2" | "rhythm" | "activity" | "sleep" | "vo2max";
 export type Quality = "ok" | "low" | "missing";
 export type Scenario = "A" | "B" | "C";
 export type SimulatorStatus = "running" | "paused";

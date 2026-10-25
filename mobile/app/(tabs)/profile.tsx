@@ -1,3 +1,4 @@
+import { AppHeader } from "@/components/AppHeader";
 import { useEffect, useState } from "react";
 import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -76,8 +77,9 @@ export default function ProfileScreen() {
   return (
     <SafeAreaView style={styles.safe} edges={["top"]}>
       <SimulatedDataRibbon />
+      <AppHeader title="Settings" />
       <ScrollView contentContainerStyle={styles.content}>
-        <Text style={styles.h1}>Settings</Text>
+
 
         {/* Care profile */}
         <Text style={styles.sectionLabel}>Care profile (optional)</Text>
@@ -223,11 +225,11 @@ export default function ProfileScreen() {
 
 const styles = StyleSheet.create({
   safe: { flex: 1, backgroundColor: theme.colors.bg },
-  content: { padding: theme.spacing(4), gap: theme.spacing(3) },
-  h1: { color: theme.colors.textPrimary, fontSize: theme.font.h1, fontWeight: "700" },
+  content: { padding: theme.spacing(4), paddingTop: 4, paddingBottom: 28, gap: theme.spacing(3) },
+  h1: { color: theme.colors.textPrimary, fontFamily: theme.type.heading, fontSize: theme.font.h1, fontWeight: "700" },
   sectionLabel: {
     color: theme.colors.textSecondary,
-    fontSize: theme.font.caption,
+    fontFamily: theme.type.mono, fontSize: theme.font.caption,
     fontWeight: "700",
     textTransform: "uppercase",
     letterSpacing: 1,
@@ -249,10 +251,10 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
     borderBottomColor: theme.colors.border,
   },
-  remove: { color: theme.colors.danger, fontSize: theme.font.caption, fontWeight: "600" },
+  remove: { color: theme.colors.danger, fontFamily: theme.type.mono, fontSize: theme.font.caption, fontWeight: "600" },
   addBtn: { paddingVertical: theme.spacing(2), alignItems: "center" },
-  addBtnText: { color: theme.colors.accent, fontSize: theme.font.body, fontWeight: "700" },
-  muted: { color: theme.colors.textSecondary, fontSize: theme.font.body },
+  addBtnText: { color: theme.colors.accent, fontFamily: theme.type.body, fontSize: theme.font.body, fontWeight: "700" },
+  muted: { color: theme.colors.textSecondary, fontFamily: theme.type.body, fontSize: theme.font.body },
   save: {
     backgroundColor: theme.colors.accent,
     borderRadius: theme.radius.md,
@@ -260,9 +262,9 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   saveDisabled: { opacity: 0.5 },
-  saveText: { color: theme.colors.bg, fontWeight: "800", fontSize: theme.font.body },
-  savedOk: { color: theme.colors.accentGreen, fontSize: theme.font.caption },
-  saveErr: { color: theme.colors.danger, fontSize: theme.font.caption },
+  saveText: { color: theme.colors.onAccent, fontWeight: "800", fontFamily: theme.type.body, fontSize: theme.font.body },
+  savedOk: { color: theme.colors.accentGreen, fontFamily: theme.type.mono, fontSize: theme.font.caption },
+  saveErr: { color: theme.colors.danger, fontFamily: theme.type.mono, fontSize: theme.font.caption },
   linkRow: { paddingVertical: theme.spacing(3), alignItems: "center" },
-  linkText: { color: theme.colors.experimental, fontSize: theme.font.body, fontWeight: "600" },
+  linkText: { color: theme.colors.experimental, fontFamily: theme.type.body, fontSize: theme.font.body, fontWeight: "600" },
 });

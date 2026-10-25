@@ -1,4 +1,4 @@
-"""Deterministic synthetic readings for six metrics and scenarios A/B/C.
+"""Deterministic synthetic readings for six hourly metrics plus daily VO2 max and scenarios A/B/C.
 
 The HTTP simulator uses ``advance`` through services.monitoring: a fresh run
 creates demo history, then a lifespan worker appends hourly ticks on an accelerated
@@ -267,7 +267,40 @@ class SimulatorService:
                     user_id=self.user_id,
                 )
             )
+        if ts.hour == 0:
+            rows.append(self._vo2_reading(ts, scenario, seed, run_offset))
         return rows
+
+    def _vo2_reading(self, ts: datetime, scenario: str, seed: int, run_offset: int) -> Measurement:
+        """Standalone daily synthetic VO2 max; not inferred from HR or SpO2.
+
+        An independent RNG leaves all pre-existing hourly metric sequences intact.
+        The values and gradual drift exist only to demonstrate trend charts.
+        """
+        rng = self._tick_rng(seed + 7919, scenario, self._tick_index(ts))
+        days = max(0, run_offset) / 24
+        drift = (-0.035 if scenario == "B" else 0.025) * days
+        value = round(float(np.clip(48.0 + drift + rng.normal(0, 0.65), 15, 80)), 2)
+        quality, value = self._apply_quality(value, rng)
+        return Measurement(timestamp=ts.isoformat(), metric_type="vo2max", value=value,
+                           quality=quality, scenario=scenario, is_synthetic=True, user_id=self.user_id)
+
+    def backfill_vo2(self) -> int:
+        """Upgrade existing synthetic demo history without replacing any readings."""
+        history = repo.query_measurements(metric_type="hr", user_id=self.user_id)
+        if not history:
+            return 0
+        existing = {self._parse_iso(r.timestamp).astimezone(timezone.utc).isoformat()
+                    for r in repo.query_measurements(metric_type="vo2max", user_id=self.user_id)}
+        anchor = self._tick_index(self._parse_iso(history[0].timestamp))
+        seed = repo.get_sim_state().seed
+        rows = []
+        for reading in history:
+            ts = self._parse_iso(reading.timestamp).astimezone(timezone.utc)
+            if reading.is_synthetic and ts.hour == 0 and ts.isoformat() not in existing:
+                rows.append(self._vo2_reading(ts, reading.scenario, seed, self._tick_index(ts) - anchor))
+                existing.add(ts.isoformat())
+        return repo.insert_measurements(rows)
 
     # ------------------------------------------------------------------ #
     # Scenario generation logic.

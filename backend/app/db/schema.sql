@@ -24,7 +24,7 @@ CREATE TABLE IF NOT EXISTS measurements (
     id            INTEGER PRIMARY KEY,
     user_id       INTEGER NOT NULL REFERENCES users(id),
     timestamp     TEXT NOT NULL,           -- ISO-8601 UTC
-    metric_type   TEXT NOT NULL,           -- 'hr' | 'hrv' | 'spo2' | 'rhythm' | 'activity' | 'sleep'
+    metric_type   TEXT NOT NULL,           -- 'hr' | 'hrv' | 'spo2' | 'rhythm' | 'activity' | 'sleep' | 'vo2max'
     value         REAL,                    -- NULL => missing/low-quality sample
     quality       TEXT NOT NULL DEFAULT 'ok', -- 'ok' | 'low' | 'missing'
     is_synthetic  INTEGER NOT NULL DEFAULT 1, -- always 1 in MVP

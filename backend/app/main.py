@@ -28,6 +28,9 @@ async def lifespan(_app: FastAPI):
     from .db.seed_providers import seed_providers
 
     seed_providers()
+    from .services.simulator import SimulatorService
+
+    SimulatorService().backfill_vo2()
     from .services.monitoring import run
 
     stop = asyncio.Event()

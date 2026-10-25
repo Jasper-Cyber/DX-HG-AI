@@ -1,58 +1,25 @@
-import { LineChart } from "react-native-gifted-charts";
-
-import { theme } from "@/theme";
-
-interface MiniTrendProps {
-  /** Values oldest→newest; null entries are treated as gaps. */
-  values: (number | null)[];
-  color: string;
-  height?: number;
-}
-
-/**
- * Compact sparkline-style trend for a metric card. Intentionally chromeless
- * (no axes/labels) so it reads as a glanceable mini chart on the dashboard.
- */
+import { useId } from "react";
+import Svg, { Circle, Defs, LinearGradient, Stop, Path } from "react-native-svg";
+interface MiniTrendProps { values: (number | null)[]; color: string; height?: number }
+/** Missing and low-quality samples keep their positions and break the trace. */
 export function MiniTrend({ values, color, height = 40 }: MiniTrendProps) {
-  // gifted-charts needs finite numbers; drop leading/trailing nulls and
-  // substitute interior nulls with the previous known value so the line stays
-  // continuous rather than crashing on NaN.
-  const data = toChartData(values);
-  if (data.length < 2) return null;
-
-  return (
-    <LineChart
-      data={data}
-      height={height}
-      thickness={2}
-      color={color}
-      hideDataPoints
-      hideAxesAndRules
-      hideYAxisText
-      yAxisThickness={0}
-      xAxisThickness={0}
-      initialSpacing={0}
-      endSpacing={0}
-      adjustToWidth
-      disableScroll
-      areaChart
-      startFillColor={color}
-      endFillColor={theme.colors.surface}
-      startOpacity={0.25}
-      endOpacity={0}
-    />
-  );
-}
-
-/** Map a nullable numeric series to gifted-charts points, bridging gaps. */
-export function toChartData(values: (number | null)[]): { value: number }[] {
-  const points: { value: number }[] = [];
-  let last: number | null = null;
-  for (const v of values) {
-    const resolved: number | null = v ?? last;
-    if (resolved === null || Number.isNaN(resolved)) continue;
-    points.push({ value: resolved });
-    last = resolved;
-  }
-  return points;
+  const id = "trend" + useId().replace(/:/g, "");
+  const usable = values.filter((v): v is number => v !== null && Number.isFinite(v));
+  if (!usable.length) return null;
+  const min = Math.min(...usable), max = Math.max(...usable);
+  const x = (i: number) => values.length === 1 ? 100 : i * 200 / (values.length - 1);
+  const y = (v: number) => max === min ? height / 2 : height - 5 - (v - min) / (max - min) * (height - 10);
+  let drawing = false;
+  const path = values.map((v, i) => {
+    if (v === null || !Number.isFinite(v)) { drawing = false; return ""; }
+    const command = `${drawing ? "L" : "M"}${x(i)},${y(v)}`;
+    drawing = true;
+    return command;
+  }).join(" ");
+  return <Svg width="100%" height={height} viewBox={`0 0 200 ${height}`} preserveAspectRatio="none">
+    <Defs><LinearGradient id={id} x1="0" y1="0" x2="0" y2="1"><Stop offset="0" stopColor={color} stopOpacity={.16} /><Stop offset="1" stopColor={color} stopOpacity={0} /></LinearGradient></Defs>
+    {usable.length === values.length && values.length > 1 && <Path d={`${path} L200,${height} L0,${height} Z`} fill={`url(#${id})`} />}
+    <Path d={path} fill="none" stroke={color} strokeWidth={1.8} vectorEffect="non-scaling-stroke" />
+    {values.map((v, i) => v !== null && Number.isFinite(v) && (i === values.length - 1 || (values[i - 1] == null && values[i + 1] == null)) ? <Circle key={i} cx={x(i)} cy={y(v)} r={2} fill={color} /> : null)}
+  </Svg>;
 }

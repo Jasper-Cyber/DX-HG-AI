@@ -1,48 +1,24 @@
 import { StyleSheet, Text, View } from "react-native";
-
+import { LinearGradient } from "expo-linear-gradient";
 import type { AlertState } from "@/api/types";
 import { alertStateMeta } from "@/utils/alerts";
 import { theme } from "@/theme";
-
-interface MonitoringStatusCardProps {
-  state: AlertState;
-  /** Optional short title from the current alert; falls back to a default. */
-  title?: string;
-}
-
-/**
- * Personalized monitoring-status banner on the dashboard (Req 1.4), colored by
- * the current alert state. Non-diagnostic wording only.
- */
-export function MonitoringStatusCard({ state, title }: MonitoringStatusCardProps) {
+import { Icon } from "./Icon";
+export function MonitoringStatusCard({ state, title }: { state: AlertState; title?: string }) {
   const meta = alertStateMeta(state);
-  return (
-    <View
-      style={[styles.card, { borderLeftColor: meta.color }]}
-      accessibilityRole="summary"
-      accessibilityLabel={`Monitoring status: ${meta.label}`}
-    >
-      <View style={styles.row}>
-        <View style={[styles.dot, { backgroundColor: meta.color }]} />
-        <Text style={[styles.status, { color: meta.color }]}>{meta.label}</Text>
-      </View>
-      <Text style={styles.title}>{title ?? meta.defaultTitle}</Text>
-    </View>
-  );
-}
+  return <LinearGradient colors={[theme.colors.accentSoft, theme.colors.surface, theme.colors.accentSoft]} start={{ x: 0, y: 1 }} end={{ x: 1, y: 0 }} style={s.card}>
+    <View style={s.row}><Icon name="shield" size={14} color={meta.color} /><Text style={[s.status, { color: meta.color }]}>{meta.label.toUpperCase()}</Text></View>
+    <Text style={s.title}>{title ?? meta.defaultTitle}</Text>
 
-const styles = StyleSheet.create({
-  card: {
-    backgroundColor: theme.colors.surface,
-    borderRadius: theme.radius.md,
-    borderWidth: 1,
-    borderColor: theme.colors.border,
-    borderLeftWidth: 4,
-    padding: theme.spacing(4),
-    gap: theme.spacing(1),
-  },
-  row: { flexDirection: "row", alignItems: "center", gap: theme.spacing(2) },
-  dot: { width: 10, height: 10, borderRadius: 5 },
-  status: { fontSize: theme.font.caption, fontWeight: "700", textTransform: "uppercase", letterSpacing: 0.5 },
-  title: { color: theme.colors.textPrimary, fontSize: theme.font.body },
+    <View style={s.footer}><Icon name="pulse" size={15} /><Text style={s.meta}>Simulation analysis</Text><View style={{ flex: 1 }} /><Icon name="shield" size={12} /><Text style={s.meta}>EXPERIMENTAL</Text></View>
+  </LinearGradient>;
+}
+const s = StyleSheet.create({
+  card: { borderRadius: 16, padding: 15, gap: 9, overflow: "hidden" },
+  row: { flexDirection: "row", alignItems: "center", gap: 6 },
+  status: { fontFamily: theme.type.mono, fontSize: 11, letterSpacing: .6 },
+  title: { fontFamily: theme.type.heading, fontSize: 18, color: theme.colors.textPrimary },
+  body: { fontFamily: theme.type.body, fontSize: 12, lineHeight: 19, color: theme.colors.textSecondary },
+  footer: { flexDirection: "row", gap: 6, alignItems: "center", paddingTop: 12, marginTop: 4, borderTopWidth: 1, borderTopColor: theme.colors.border },
+  meta: { fontFamily: theme.type.mono, fontSize: 11, color: theme.colors.pale },
 });

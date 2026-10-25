@@ -28,15 +28,15 @@ export function EmergencyGuidanceCard({ guidance }: EmergencyGuidanceCardProps) 
 
 const styles = StyleSheet.create({
   card: {
-    backgroundColor: theme.colors.surface,
+    backgroundColor: theme.colors.dangerSoft,
     borderRadius: theme.radius.md,
     borderWidth: 1,
     borderColor: theme.colors.danger,
-    borderLeftWidth: 4,
+    borderLeftWidth: 1,
     borderLeftColor: theme.colors.danger,
     padding: theme.spacing(4),
     gap: theme.spacing(2),
   },
-  heading: { color: theme.colors.danger, fontSize: theme.font.h2, fontWeight: "700" },
-  body: { color: theme.colors.textPrimary, fontSize: theme.font.body, lineHeight: 22 },
+  heading: { color: theme.colors.danger, fontFamily: theme.type.heading, fontSize: theme.font.h2, fontWeight: "700" },
+  body: { color: theme.colors.textPrimary, fontFamily: theme.type.body, fontSize: theme.font.body, lineHeight: 22 },
 });

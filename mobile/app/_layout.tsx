@@ -1,3 +1,8 @@
+import { ActivityIndicator, View } from "react-native";
+import { useFonts } from "expo-font";
+import { SpaceGrotesk_500Medium } from "@expo-google-fonts/space-grotesk/500Medium";
+import { PlusJakartaSans_400Regular } from "@expo-google-fonts/plus-jakarta-sans/400Regular";
+import { JetBrainsMono_400Regular } from "@expo-google-fonts/jetbrains-mono/400Regular";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { Stack, router } from "expo-router";
 import { StatusBar } from "expo-status-bar";
@@ -24,12 +29,20 @@ function DisclaimerGate() {
 }
 
 /**
- * Root layout. Wraps the app in React Query and a dark stack navigator.
+ * Root layout. Wraps the app in React Query and a light stack navigator.
  */
 export default function RootLayout() {
+  const [loaded, fontError] = useFonts({
+    SpaceGrotesk: SpaceGrotesk_500Medium,
+    PlusJakartaSans: PlusJakartaSans_400Regular,
+    JetBrainsMono: JetBrainsMono_400Regular,
+  });
+  if (!loaded && !fontError) return <View style={{ flex: 1, backgroundColor: theme.colors.bg, alignItems: "center", justifyContent: "center" }}><ActivityIndicator color={theme.colors.accent} /></View>;
   return (
     <QueryClientProvider client={queryClient}>
-      <StatusBar style="light" />
+      <View style={{ flex: 1, backgroundColor: theme.colors.bg, alignItems: "center" }}>
+      <View style={{ flex: 1, width: "100%", maxWidth: 520, backgroundColor: theme.colors.bg }}>
+      <StatusBar style="dark" />
       <DisclaimerGate />
       <Stack
         screenOptions={{
@@ -42,6 +55,8 @@ export default function RootLayout() {
         <Stack.Screen name="disclaimer" options={{ presentation: "modal", title: "Disclaimer" }} />
         <Stack.Screen name="emergency" options={{ presentation: "modal", title: "Emergency" }} />
       </Stack>
+      </View>
+      </View>
     </QueryClientProvider>
   );
 }

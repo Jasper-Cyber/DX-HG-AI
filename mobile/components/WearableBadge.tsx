@@ -15,7 +15,7 @@ interface WearableBadgeProps {
  */
 export function WearableBadge({ connected, simulating }: WearableBadgeProps) {
   const color = connected ? (simulating ? theme.colors.accentGreen : theme.colors.accent) : theme.colors.textSecondary;
-  const label = !connected ? "No source" : simulating ? "Live (simulated)" : "Connected (simulated)";
+  const label = !connected ? "No source" : simulating ? "Streaming demo" : "Demo paused";
 
   return (
     <View style={[styles.badge, { borderColor: color }]} accessibilityLabel={`Wearable: ${label}`}>
@@ -30,11 +30,11 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     gap: theme.spacing(2),
-    borderWidth: 1,
+    borderWidth: 0,
     borderRadius: theme.radius.lg,
     paddingVertical: theme.spacing(1),
     paddingHorizontal: theme.spacing(3),
   },
   dot: { width: 8, height: 8, borderRadius: 4 },
-  text: { fontSize: theme.font.caption, fontWeight: "600" },
+  text: { fontFamily: theme.type.mono, fontSize: 11, fontWeight: "600" },
 });

@@ -64,8 +64,8 @@ const styles = StyleSheet.create({
     gap: 2,
   },
   row: { flexDirection: "row", justifyContent: "space-between", alignItems: "center" },
-  recipient: { color: theme.colors.textPrimary, fontSize: theme.font.body, fontWeight: "700", flexShrink: 1 },
-  meta: { color: theme.colors.textSecondary, fontSize: theme.font.caption },
-  status: { fontSize: theme.font.caption, fontWeight: "600", marginTop: 2 },
-  empty: { color: theme.colors.textSecondary, fontSize: theme.font.body },
+  recipient: { color: theme.colors.textPrimary, fontFamily: theme.type.body, fontSize: theme.font.body, fontWeight: "700", flexShrink: 1 },
+  meta: { color: theme.colors.textSecondary, fontFamily: theme.type.mono, fontSize: theme.font.caption },
+  status: { fontFamily: theme.type.mono, fontSize: theme.font.caption, fontWeight: "600", marginTop: 2 },
+  empty: { color: theme.colors.textSecondary, fontFamily: theme.type.body, fontSize: theme.font.body },
 });

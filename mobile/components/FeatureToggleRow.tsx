@@ -28,8 +28,8 @@ export function FeatureToggleRow({
         value={value}
         onValueChange={onValueChange}
         disabled={disabled}
-        trackColor={{ false: theme.colors.border, true: theme.colors.accent }}
-        thumbColor={theme.colors.textPrimary}
+        trackColor={{ false: theme.colors.controlBorder, true: theme.colors.accent }}
+        thumbColor={theme.colors.onAccent}
         accessibilityLabel={label}
         accessibilityState={{ checked: value, disabled: !!disabled }}
       />
@@ -46,6 +46,6 @@ const styles = StyleSheet.create({
     paddingVertical: theme.spacing(2),
   },
   text: { flex: 1 },
-  label: { color: theme.colors.textPrimary, fontSize: theme.font.body, fontWeight: "600" },
-  desc: { color: theme.colors.textSecondary, fontSize: theme.font.caption, marginTop: theme.spacing(1) },
+  label: { color: theme.colors.textPrimary, fontFamily: theme.type.body, fontSize: theme.font.body, fontWeight: "600" },
+  desc: { color: theme.colors.textSecondary, fontFamily: theme.type.mono, fontSize: theme.font.caption, marginTop: theme.spacing(1) },
 });

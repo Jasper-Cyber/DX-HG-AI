@@ -5,6 +5,7 @@ import HistoryScreen from "@/app/(tabs)/history";
 jest.mock("react-native-safe-area-context", () => ({ SafeAreaView: require("react-native").View }));
 jest.mock("@/components/TrendChart", () => ({ TrendChart: () => null }));
 jest.mock("@/api/hooks", () => ({
+  useMeasurements: () => ({ data: [] }),
   useTrends: () => ({ data: { series: [] }, isLoading: false }),
   useAlertHistory: () => ({ data: [
     { id: 2, state: "normal", title: "Recovered baseline", createdAt: "2026-01-02T00:00:00Z" },
