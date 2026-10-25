@@ -1,0 +1,11 @@
+# Runtime + dev dependencies for teammates who prefer plain pip over pyproject extras.
+# Install with:  pip install -r requirements.txt
+fastapi>=0.111
+uvicorn[standard]>=0.30
+pydantic>=2.7
+sqlalchemy>=2.0
+numpy>=1.26
+pandas>=2.2
+scikit-learn>=1.5
+pytest>=8.2
+httpx>=0.27

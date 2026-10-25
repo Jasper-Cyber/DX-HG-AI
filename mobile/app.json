@@ -1,0 +1,35 @@
+{
+  "expo": {
+    "name": "HeartGuardian AI",
+    "slug": "heartguardian-ai",
+    "version": "0.1.0",
+    "orientation": "portrait",
+    "userInterfaceStyle": "dark",
+    "scheme": "heartguardian",
+    "newArchEnabled": true,
+    "splash": {
+      "resizeMode": "contain",
+      "backgroundColor": "#0A1628"
+    },
+    "ios": {
+      "supportsTablet": true
+    },
+    "android": {
+      "adaptiveIcon": {
+        "backgroundColor": "#0A1628"
+      }
+    },
+    "web": {
+      "bundler": "metro"
+    },
+    "plugins": [
+      "expo-router",
+      [
+        "expo-location",
+        {
+          "locationWhenInUsePermission": "HeartGuardian uses your location only when you choose to find nearby providers or trigger the optional emergency flow. This is an experimental prototype."
+        }
+      ]
+    ]
+  }
+}
