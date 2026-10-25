@@ -7,10 +7,10 @@ const readings: Reading[] = Array.from({ length: 15 * 24 }, (_, i) => ({
   value: 60 + Math.floor(i / 24), quality: "ok", isSynthetic: true, scenario: "A",
 }));
 
-it("lets a user inspect a bar and switch between weekly and monthly trends", () => {
+it("lets a user select a weekly scatter point and switch to monthly bars", () => {
   const screen = render(<HealthTrendDetails readings={readings} metric="hr" />);
-  const bar = screen.getByLabelText(/2026-01-08: average/);
-  fireEvent.press(bar);
+  expect(screen.getByLabelText(/Weekly daily-average scatterplot/)).toBeTruthy();
+  fireEvent.press(screen.getByLabelText(/Select 2026-01-08, daily average/));
   expect(screen.getByText("2026-01-08")).toBeTruthy();
   expect(screen.getByLabelText(/2026-01-08: average/).props.accessibilityState.selected).toBe(true);
   expect(screen.queryByText("Experimental estimate")).toBeNull();
@@ -18,6 +18,7 @@ it("lets a user inspect a bar and switch between weekly and monthly trends", () 
   expect(screen.getByText("Experimental estimate")).toBeTruthy();
   expect(screen.getByText(/Not a measured value/)).toBeTruthy();
   fireEvent.press(screen.getByLabelText("Monthly trend"));
+  expect(screen.queryByLabelText(/Weekly daily-average scatterplot/)).toBeNull();
   expect(screen.getByText("Daily averages · last 30 complete UTC days")).toBeTruthy();
   expect(screen.getByText("Not enough comparable history")).toBeTruthy();
 });

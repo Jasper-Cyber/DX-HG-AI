@@ -1,3 +1,5 @@
+import Svg, { Line, Text as SvgText } from "react-native-svg";
+import { SelectableChartPoint } from "./SelectableChartPoint";
 import { ChartLegend } from "./ChartLegend";
 import { useMemo, useState } from "react";
 import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
@@ -26,11 +28,13 @@ export function HealthTrendDetails({ readings, metric }: { readings: Reading[]; 
     <View style={s.panel}>
       <View style={s.between}><Text style={s.title}>{days === 7 ? "Weekly trend" : "Monthly trend"}</Text><Text style={s.muted}>{unit}</Text></View>
       <Text style={s.muted}>Daily averages · last {days} complete UTC days</Text>
-      <Text style={s.scale}>0–{maximum.toFixed(0)} {unit}</Text>
-      <ScrollView horizontal showsHorizontalScrollIndicator={days === 30}><View style={[s.bars, { width: days === 30 ? 1320 : 308 }]}>{summary.current.map((d, i) => <DailyBar rangeColor={chartCompanion[metric]} color={palette.ink} key={d.date} day={d} index={i} count={days} maximum={maximum} selected={d.date === selectedDay.date} onPress={() => setSelected(d.date)} />)}</View></ScrollView>
+      {days === 7 ? <WeeklyScatter days={summary.current} color={palette.ink} rangeColor={chartCompanion[metric]} selected={selectedDay.date} onSelect={setSelected} unit={unit} /> : <>
+        <Text style={s.scale}>0–{maximum.toFixed(0)} {unit}</Text>
+        <ScrollView horizontal showsHorizontalScrollIndicator><View style={[s.bars, { width: 1320 }]}>{summary.current.map((d, i) => <DailyBar rangeColor={chartCompanion[metric]} color={palette.ink} key={d.date} day={d} index={i} count={days} maximum={maximum} selected={d.date === selectedDay.date} onPress={() => setSelected(d.date)} />)}</View></ScrollView>
+      </>}
       <View style={s.between}><Text style={s.small}>{summary.current[0].date.slice(5)}</Text><Text style={s.small}>{summary.yesterday.date.slice(5)}</Text></View>
-      <ChartLegend items={[{ label: "Daily average", color: palette.ink, mark: "bar" }, { label: "Min–max range", color: chartCompanion[metric] }]} />
-      <Text style={s.tip}>Bars show the average; vertical lines show min–max. Tap a day for its values, or scroll across the month. A dash means no data.</Text>
+      <ChartLegend items={[{ label: "Daily average", color: palette.ink, mark: days === 7 ? "dot" : "bar" }, { label: "Min–max range", color: chartCompanion[metric] }]} />
+      <Text style={s.tip}>{days === 7 ? "Dots show daily averages; vertical lines show min–max. Select a dot or date to explore. Missing days have no dot." : "Bars show the average; vertical lines show min–max. Tap a day for its values, or scroll across the month. A dash means no data."}</Text>
       <View style={s.selection}><Text style={[s.selectionDate, { color: palette.ink }]}>{selectedDay.date}</Text><View style={s.between}>{[["Min", selectedDay.min], ["Average", selectedDay.mean], ["Max", selectedDay.max]].map(([label, value]) => <View key={String(label)}><Text style={s.small}>{label}</Text><Text style={s.number}>{fmt(value as number | null)}</Text></View>)}</View><Text style={s.small}>{selectedDay.count} usable samples · {unit}</Text></View>
       <View style={s.between}><Text style={s.muted}>Period average</Text><Text style={s.number}>{fmt(summary.average)} <Text style={s.small}>{unit}</Text></Text></View>
       <Text style={[s.change, { color: palette.ink }]}>{changeText}</Text><Text style={s.small}>Compared with the preceding {days} days. Direction describes the numbers, not health improvement.</Text>
@@ -47,6 +51,33 @@ export function HealthTrendDetails({ readings, metric }: { readings: Reading[]; 
     {showMethod && <Text style={s.small}>The incomplete simulation day ({summary.excludedPartialDate}) is excluded from comparisons. Low-quality and missing samples are excluded throughout.</Text>}
   </View>;
 }
+function WeeklyScatter({ days, color, rangeColor, selected, onSelect, unit }: {
+  days: DailySummary[]; color: string; rangeColor: string; selected: string;
+  onSelect: (date: string) => void; unit: string;
+}) {
+  const values = days.flatMap(d => [d.min, d.mean, d.max].filter((v): v is number => v !== null && Number.isFinite(v)));
+  const min = values.length ? Math.min(...values) : 0;
+  const max = values.length ? Math.max(...values) : 1;
+  const padding = Math.max((max - min) * .15, 1);
+  const low = Math.max(0, min - padding), high = max + padding;
+  const x = (i: number) => 52 + i * 44;
+  const y = (value: number) => 154 - (value - low) / (high - low) * 130;
+  return <View>
+    <Svg width="100%" height={185} viewBox="0 0 350 185" accessibilityLabel={`Weekly daily-average scatterplot, ${unit}, with minimum and maximum ranges`}>
+      {[0, 1, 2, 3].map(i => {
+        const value = low + (high - low) * i / 3;
+        return <Line key={i} x1={42} x2={338} y1={y(value)} y2={y(value)} stroke={theme.colors.border} strokeDasharray="3 4" />;
+      })}
+      {[0, 1, 2, 3].map(i => {
+        const value = low + (high - low) * i / 3;
+        return <SvgText key={i} x={36} y={y(value) + 4} textAnchor="end" fontSize={12} fill={theme.colors.textSecondary}>{value.toFixed(1)}</SvgText>;
+      })}
+      {days.map((d, i) => d.min !== null && d.max !== null && <Line key={d.date} x1={x(i)} x2={x(i)} y1={y(d.min)} y2={y(d.max)} stroke={rangeColor} strokeWidth={2} />)}
+      {days.map((d, i) => d.mean === null ? null : <SelectableChartPoint key={d.date} cx={x(i)} cy={y(d.mean)} r={d.date === selected ? 6 : 4} fill={color} stroke={d.date === selected ? theme.colors.textPrimary : theme.colors.surface} label={`Select ${d.date}, daily average ${d.mean.toFixed(1)} ${unit}`} selected={d.date === selected} onSelect={() => onSelect(d.date)} />)}
+    </Svg>
+    <View style={s.scatterDates}>{days.map(d => <Pressable key={d.date} accessibilityRole="button" accessibilityState={{ selected: d.date === selected }} accessibilityLabel={`${d.date}: ${d.mean === null ? "No data" : `average ${d.mean.toFixed(1)}, minimum ${d.min?.toFixed(1)}, maximum ${d.max?.toFixed(1)}`}`} onPress={() => onSelect(d.date)} style={[s.scatterDate, d.date === selected && { backgroundColor: color }]}><Text style={[s.small, d.date === selected && { color: theme.colors.onAccent }]}>{d.date.slice(8)}</Text>{d.mean === null && <Text style={[s.small, d.date === selected && { color: theme.colors.onAccent }]}>—</Text>}</Pressable>)}</View>
+  </View>;
+}
 function DailyBar({ rangeColor, color, day, index, count, maximum, selected, onPress }: { rangeColor: string; color: string; day: DailySummary; index: number; count: number; maximum: number; selected: boolean; onPress: () => void }) {
   const height = day.mean === null ? 0 : day.mean / maximum * 100;
   return <Pressable onPress={onPress} style={[s.barColumn, selected && { borderBottomWidth: 2, borderBottomColor: color }]} accessibilityRole="button" accessibilityState={{ selected }} accessibilityLabel={`${day.date}: ${day.mean === null ? "No data" : `average ${day.mean.toFixed(1)}, minimum ${day.min?.toFixed(1)}, maximum ${day.max?.toFixed(1)}`}`}>
@@ -57,6 +88,8 @@ function DailyBar({ rangeColor, color, day, index, count, maximum, selected, onP
   </Pressable>;
 }
 const s = StyleSheet.create({
+  scatterDates: { flexDirection: "row", marginLeft: "8.5%", marginRight: "3.5%" },
+  scatterDate: { flex: 1, minHeight: 44, alignItems: "center", justifyContent: "center", borderRadius: 8 },
   methodButton: { minHeight: 48, justifyContent: "center", padding: 12, borderRadius: 12, borderWidth: 1, borderColor: theme.colors.controlBorder },
   methodLabel: { fontFamily: theme.type.heading, fontSize: 13, color: theme.colors.textPrimary },
   stack: { gap: 14, marginTop: 20 }, heading: { flexDirection: "row", alignItems: "center", gap: 8 },
