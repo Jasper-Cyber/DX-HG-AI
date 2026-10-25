@@ -38,8 +38,8 @@ The MVP excludes production integration. CNN-LSTM, ONNX, `/stroke/*`, mobile UI,
     - Checkpoint: ensure the model artifact, real-motion provenance, pure fusion, canonical metrics, and all three runnable CLI outcomes are complete before proceeding; ask the user only if execution is blocked.
     - _Requirements: 6.1–6.4, 8.1–8.5, 8.8, 9.1–9.4, 11.1–11.5, 12.3–12.10, 14.5, 15.1–15.3, 16.2–16.5, 18.4–18.5, 19.2, 20.3, 21.2, 21.5, 23.4_
 
-- [ ] 3. Add focused tests and truthful docs, enforce the time box, validate, and commit locally
-  - [-] 3.1 Test, document, clean, and commit the MVP without exceeding 60 minutes (estimated: 15 minutes; cumulative: 55 minutes)
+- [x] 3. Add focused tests and truthful docs, enforce the time box, validate, and commit locally
+  - [x] 3.1 Test, document, clean, and commit the MVP without exceeding 60 minutes (estimated: 15 minutes; cumulative: 55 minutes)
     - Add focused pytest coverage following existing `backend/tests/` conventions. Keep tests offline and deterministic, use temporary paths, and cover: achieved cohort counts plus exact split disjointness; deterministic ECG features and fusion; motion-artifact exclusion; threshold monotonicity; cancel idempotency and the cancel/nudge cap only if nudge exists; and expected outcomes for all three personas.
     - Encode the scoped universal checks as parameterized/property-style tests tied to design Properties 2, 5, 6, 8, 14, 17, 18, 19, 25, 26 (only if nudge exists), and 28. Do not add a new test dependency unless it is essential and there is sufficient time; if Hypothesis is already available, bound its examples for fast execution.
     - Complete `docs/MVP_EVALUATION.md` from actual artifacts: exact achieved sample size/classes/splits, model-selection result, held-out metrics, confusion matrix, shuffle result, overfit/generalization flags with interpretation, motion sample provenance, elapsed stages, and failed/skipped items. Truthfully distinguish completed evidence from planned full-feature work.
