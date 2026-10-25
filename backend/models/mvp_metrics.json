@@ -1,0 +1,104 @@
+{
+  "data": {
+    "classCounts": {
+      "A": 300,
+      "N": 700
+    },
+    "invalidFeatureRows": 49,
+    "rows": 1000,
+    "validBySplit": {
+      "test": 142,
+      "train": 665,
+      "validation": 144
+    },
+    "validFeatureRows": 951
+  },
+  "evaluation": {
+    "test": {
+      "auprc": 0.858808,
+      "auroc": 0.939239,
+      "confusionMatrix": {
+        "fn": 15,
+        "fp": 6,
+        "tn": 92,
+        "tp": 29
+      },
+      "f1": 0.734177,
+      "sensitivity": 0.659091,
+      "specificity": 0.938776
+    },
+    "testEvaluatedOnceAtUtc": "2026-10-25T10:27:54.587122Z",
+    "train": {
+      "auprc": 0.962524,
+      "auroc": 0.980413,
+      "confusionMatrix": {
+        "fn": 30,
+        "fp": 14,
+        "tn": 444,
+        "tp": 177
+      },
+      "f1": 0.889447,
+      "sensitivity": 0.855072,
+      "specificity": 0.969432
+    },
+    "validation": {
+      "auprc": 0.896718,
+      "auroc": 0.952381,
+      "confusionMatrix": {
+        "fn": 4,
+        "fp": 7,
+        "tn": 95,
+        "tp": 38
+      },
+      "f1": 0.873563,
+      "sensitivity": 0.904762,
+      "specificity": 0.931373
+    }
+  },
+  "flags": {
+    "generalizationGap": false,
+    "generalizationGapValue": 0.028032,
+    "leakageSuspect": false,
+    "overfitSuspect": false,
+    "perfectMetrics": []
+  },
+  "isMedicalValidation": false,
+  "limitations": [
+    "CinC 2017 rhythm labels are not stroke outcomes.",
+    "Results are experimental and are not clinical or medical validation.",
+    "Invalid ECG windows are data-quality cases and receive no probability."
+  ],
+  "modelVersion": "mvp-v1-gradient_boosting-5c71fa63-s42",
+  "schema": "ml_mvp_metrics/v1",
+  "selection": {
+    "candidates": {
+      "gradient_boosting": {
+        "validationAuprc": 0.896718,
+        "validationAuroc": 0.952381
+      },
+      "logistic_regression": {
+        "validationAuprc": 0.835252,
+        "validationAuroc": 0.948413
+      }
+    },
+    "criterion": "highest validation AUPRC",
+    "selectedModel": "gradient_boosting"
+  },
+  "shuffleCheck": {
+    "expectedRange": [
+      0.4,
+      0.6
+    ],
+    "seed": 42,
+    "selectedModelRetrainedOnShuffledTrainLabels": true,
+    "validationAuroc": 0.580065
+  },
+  "taskScope": "non-production AF-like rhythm and motion fusion experiment",
+  "threshold": {
+    "rule": "highest midpoint threshold with sensitivity >= 0.90",
+    "selectedFrom": "validation only",
+    "sensitivityShortfall": false,
+    "validationSensitivity": 0.904762,
+    "value": 0.761676078
+  }
+}

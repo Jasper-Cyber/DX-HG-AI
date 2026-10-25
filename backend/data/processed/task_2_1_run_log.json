@@ -1,0 +1,99 @@
+{
+  "blockers": [],
+  "buildElapsedSeconds": 2.763,
+  "command": "conda run --no-capture-output -n hack1 python -m ml_mvp.build_mvp",
+  "completedAtUtc": "2026-10-25T10:30:06.339924Z",
+  "completedBuildAtUtc": "2026-10-25T10:27:56.516951Z",
+  "documentationInputs": [
+    "models\\mvp_metrics.json",
+    "data\\processed\\motion_manifest.json",
+    "data\\processed\\mvp_personas.json",
+    "data\\processed\\task_2_1_run_log.json"
+  ],
+  "elapsedSeconds": 132.586,
+  "motionRows": 8,
+  "overallCumulativeSeconds": 726.443,
+  "personaIds": [
+    "false_alarm",
+    "healthy",
+    "possible_acute_event"
+  ],
+  "personaRuns": {
+    "false_alarm": {
+      "command": "conda run --no-capture-output -n hack1 python -m ml_mvp.demo --persona false_alarm --countdown-seconds 0.2",
+      "completedAtUtc": "2026-10-25T10:30:06.339903Z",
+      "guardrailDowngradeCount": 8,
+      "result": "passed",
+      "simulatedOnly": true,
+      "terminalState": "data_quality",
+      "warningCount": 0,
+      "warningStatus": "none"
+    },
+    "healthy": {
+      "command": "conda run --no-capture-output -n hack1 python -m ml_mvp.demo --persona healthy --countdown-seconds 0.2",
+      "completedAtUtc": "2026-10-25T10:28:25.861647Z",
+      "guardrailDowngradeCount": 0,
+      "result": "passed",
+      "simulatedOnly": true,
+      "terminalState": "normal",
+      "warningCount": 0,
+      "warningStatus": "none"
+    },
+    "possible_acute_event": {
+      "command": "conda run --no-capture-output -n hack1 python -m ml_mvp.demo --persona possible_acute_event --countdown-seconds 0.2",
+      "completedAtUtc": "2026-10-25T10:28:41.291371Z",
+      "guardrailDowngradeCount": 8,
+      "result": "passed",
+      "simulatedOnly": true,
+      "terminalState": "warning",
+      "warningCount": 1,
+      "warningStatus": "escalated"
+    }
+  },
+  "priorTaskElapsedSeconds": 593.857,
+  "schema": "ml_mvp_task_2_1_run_log/v1",
+  "selectedModel": "gradient_boosting",
+  "stages": [
+    {
+      "elapsedSeconds": 0.853,
+      "name": "train_select_evaluate",
+      "result": "passed"
+    },
+    {
+      "elapsedSeconds": 1.038,
+      "name": "acquire_extract_real_motion",
+      "result": "passed"
+    },
+    {
+      "elapsedSeconds": 0.867,
+      "name": "build_persona_inputs",
+      "result": "passed"
+    },
+    {
+      "elapsedSeconds": 0.0,
+      "name": "warning_state_machine_self_check",
+      "result": "passed"
+    }
+  ],
+  "startedAtUtc": "2026-10-25T10:27:53.754211Z",
+  "status": "completed",
+  "task": "2.1 Build and exercise the complete non-production MVP demo path",
+  "taskLimitSeconds": 1320,
+  "testMetrics": {
+    "auprc": 0.858808,
+    "auroc": 0.939239,
+    "confusionMatrix": {
+      "fn": 15,
+      "fp": 6,
+      "tn": 92,
+      "tp": 29
+    },
+    "f1": 0.734177,
+    "sensitivity": 0.659091,
+    "specificity": 0.938776
+  },
+  "warningSelfCheck": {
+    "automaticAction": "simulated_cli_only",
+    "cancelIdempotent": true
+  }
+}

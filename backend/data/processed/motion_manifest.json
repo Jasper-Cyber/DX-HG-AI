@@ -1,0 +1,220 @@
+{
+  "extraction": {
+    "activities": [
+      "lying",
+      "sit_to_lie",
+      "sitting",
+      "stand_to_lie",
+      "standing",
+      "walking",
+      "walking_downstairs",
+      "walking_upstairs"
+    ],
+    "boundedRows": 8,
+    "method": "One first finite 10-second accelerometer/gyroscope window for each required activity; transition windows are centered on the labeled transition.",
+    "samplingRateHz": 50,
+    "windowSamples": 500
+  },
+  "limitations": [
+    "This is a small bounded fixture rather than the full UCI HAPT archive.",
+    "The source is a waist-worn smartphone in scripted laboratory activities, not a wrist wearable.",
+    "Lying transitions are controlled transitions, not falls or stroke events."
+  ],
+  "processedFile": {
+    "bytes": 49873,
+    "path": "processed/hapt_motion_subset.npz",
+    "sha256": "1f1f7b6aba7dfb980e4ef81a60c47ab472a9798846b359c4344d6995f5fa877a"
+  },
+  "rows": [
+    {
+      "activity": "walking",
+      "activityId": 1,
+      "dataset": "uci_hapt",
+      "derived": {
+        "activityState": "dynamic",
+        "artifact": true,
+        "energyG2": 0.03889668,
+        "jerkRmsGps": 7.264836,
+        "postureAngleDeg": 13.337917
+      },
+      "experimentId": 1,
+      "isSynthetic": false,
+      "originalFsHz": 50,
+      "row": 0,
+      "sampleOffset": 7495,
+      "sourceSegmentEnd": 8078,
+      "sourceSegmentStart": 7496,
+      "subjectId": 1,
+      "windowSamples": 500
+    },
+    {
+      "activity": "walking_upstairs",
+      "activityId": 2,
+      "dataset": "uci_hapt",
+      "derived": {
+        "activityState": "dynamic",
+        "artifact": true,
+        "energyG2": 0.03456699,
+        "jerkRmsGps": 4.815867,
+        "postureAngleDeg": 17.436722
+      },
+      "experimentId": 1,
+      "isSynthetic": false,
+      "originalFsHz": 50,
+      "row": 1,
+      "sampleOffset": 14068,
+      "sourceSegmentEnd": 14699,
+      "sourceSegmentStart": 14069,
+      "subjectId": 1,
+      "windowSamples": 500
+    },
+    {
+      "activity": "walking_downstairs",
+      "activityId": 3,
+      "dataset": "uci_hapt",
+      "derived": {
+        "activityState": "dynamic",
+        "artifact": true,
+        "energyG2": 0.05013003,
+        "jerkRmsGps": 8.420439,
+        "postureAngleDeg": 11.346918
+      },
+      "experimentId": 1,
+      "isSynthetic": false,
+      "originalFsHz": 50,
+      "row": 2,
+      "sampleOffset": 13190,
+      "sourceSegmentEnd": 13846,
+      "sourceSegmentStart": 13191,
+      "subjectId": 1,
+      "windowSamples": 500
+    },
+    {
+      "activity": "sitting",
+      "activityId": 4,
+      "dataset": "uci_hapt",
+      "derived": {
+        "activityState": "static",
+        "artifact": false,
+        "energyG2": 0.00835128,
+        "jerkRmsGps": 0.569753,
+        "postureAngleDeg": 29.372375
+      },
+      "experimentId": 1,
+      "isSynthetic": false,
+      "originalFsHz": 50,
+      "row": 3,
+      "sampleOffset": 1392,
+      "sourceSegmentEnd": 2194,
+      "sourceSegmentStart": 1393,
+      "subjectId": 1,
+      "windowSamples": 500
+    },
+    {
+      "activity": "standing",
+      "activityId": 5,
+      "dataset": "uci_hapt",
+      "derived": {
+        "activityState": "static",
+        "artifact": false,
+        "energyG2": 3.802e-05,
+        "jerkRmsGps": 0.173434,
+        "postureAngleDeg": 8.686096
+      },
+      "experimentId": 1,
+      "isSynthetic": false,
+      "originalFsHz": 50,
+      "row": 4,
+      "sampleOffset": 249,
+      "sourceSegmentEnd": 1232,
+      "sourceSegmentStart": 250,
+      "subjectId": 1,
+      "windowSamples": 500
+    },
+    {
+      "activity": "lying",
+      "activityId": 6,
+      "dataset": "uci_hapt",
+      "derived": {
+        "activityState": "lying",
+        "artifact": false,
+        "energyG2": 1.697e-05,
+        "jerkRmsGps": 0.20743,
+        "postureAngleDeg": 79.083911
+      },
+      "experimentId": 1,
+      "isSynthetic": false,
+      "originalFsHz": 50,
+      "row": 5,
+      "sampleOffset": 3662,
+      "sourceSegmentEnd": 4538,
+      "sourceSegmentStart": 3663,
+      "subjectId": 1,
+      "windowSamples": 500
+    },
+    {
+      "activity": "sit_to_lie",
+      "activityId": 9,
+      "dataset": "uci_hapt",
+      "derived": {
+        "activityState": "dynamic",
+        "artifact": true,
+        "energyG2": 0.06523593,
+        "jerkRmsGps": 1.589618,
+        "postureAngleDeg": 47.225724
+      },
+      "experimentId": 1,
+      "isSynthetic": false,
+      "originalFsHz": 50,
+      "row": 6,
+      "sampleOffset": 5513,
+      "sourceSegmentEnd": 5859,
+      "sourceSegmentStart": 5668,
+      "subjectId": 1,
+      "windowSamples": 500
+    },
+    {
+      "activity": "stand_to_lie",
+      "activityId": 11,
+      "dataset": "uci_hapt",
+      "derived": {
+        "activityState": "dynamic",
+        "artifact": true,
+        "energyG2": 0.15502205,
+        "jerkRmsGps": 2.445027,
+        "postureAngleDeg": 47.662155
+      },
+      "experimentId": 1,
+      "isSynthetic": false,
+      "originalFsHz": 50,
+      "row": 7,
+      "sampleOffset": 3268,
+      "sourceSegmentEnd": 3662,
+      "sourceSegmentStart": 3375,
+      "subjectId": 1,
+      "windowSamples": 500
+    }
+  ],
+  "schema": "ml_mvp_motion_manifest/v1",
+  "source": {
+    "archiveBytes": 79596192,
+    "archiveSha256": "4ac4ae064227c07045a99551876b54d204837e995e298b6488559e209b3deb09",
+    "archiveUrl": "https://archive.ics.uci.edu/static/public/341/smartphone+based+recognition+of+human+activities+and+postural+transitions.zip",
+    "citationUrl": "https://archive.ics.uci.edu/dataset/341/smartphone+based+recognition+of+human+activities+and+postural+transitions",
+    "dataset": "UCI Smartphone-Based Recognition of Human Activities and Postural Transitions (HAPT)",
+    "isSynthetic": false,
+    "license": "Creative Commons Attribution 4.0 International (CC BY 4.0)",
+    "licenseUrl": "https://creativecommons.org/licenses/by/4.0/legalcode",
+    "sourceUrl": "https://archive.ics.uci.edu/dataset/341/smartphone+based+recognition+of+human+activities+and+postural+transitions",
+    "version": "UCI repository snapshot accessed 2026-10-25"
+  },
+  "thresholds": {
+    "artifactJerkRmsGps": 0.75,
+    "artifactMagnitudeVarianceG2": 0.02,
+    "dynamicEnergyG2": 0.01,
+    "impactPeakG": 2.5,
+    "inactivityEnergyG2": 0.002,
+    "lyingAngleDeg": 60.0,
+    "prolongedInactivitySeconds": 60.0
+  }
+}

@@ -1,0 +1,65 @@
+{
+  "baselineComparison": {
+    "baselineElapsedSeconds": 4.155,
+    "baselineFailed": 0,
+    "baselinePassed": 23,
+    "failingTests": [],
+    "newFailures": 0,
+    "postChangeElapsedSeconds": 4.19,
+    "postChangeFailed": 0,
+    "postChangePassed": 23
+  },
+  "blockers": [],
+  "branch": "feat/stroke-ecg-motion",
+  "commitMessage": "feat: add one-hour stroke risk MVP",
+  "completedAtUtc": "2026-10-25T10:36:19.1461419Z",
+  "cumulativeElapsedSeconds": 903.518,
+  "documentation": [
+    "README.md",
+    "backend/data/README.md",
+    "docs/DEMO.md",
+    "docs/MVP_EVALUATION.md",
+    "docs/PRIOR_ART.md"
+  ],
+  "hardDeadlineSeconds": 3600,
+  "hygiene": {
+    "cachesIgnoredAndUnstaged": true,
+    "largestCommittedArtifactBytes": 4673181,
+    "liveDatabasesIgnoredAndUnstaged": true,
+    "mobileUiEdited": false,
+    "partialDownloadFilesFound": 0,
+    "rawDataIgnoredAndUnstaged": true,
+    "secretsFoundInStaging": false,
+    "serversWatchersOrDownloadersRunning": false,
+    "steeringFilesIgnoredViaGitInfoExclude": true
+  },
+  "priorTaskCumulativeSeconds": 726.443,
+  "pythonEnvironment": {
+    "condaExecutable": "C:\\Users\\RAFF\\Applications\\miniconda3\\Scripts\\conda.exe",
+    "environment": "hack1",
+    "verifiedPythonExecutable": "C:\\Users\\RAFF\\Applications\\miniconda3\\envs\\hack1\\python.exe"
+  },
+  "schema": "ml_mvp_task_3_1_run_log/v1",
+  "startedAtUtc": "2026-10-25T10:33:22.0713140Z",
+  "status": "completed",
+  "task": "3.1 Test, document, clean, and commit the MVP without exceeding 60 minutes",
+  "taskElapsedSeconds": 177.075,
+  "tests": {
+    "backendSmoke": {
+      "command": "conda run --no-capture-output -n hack1 python -m pytest -q tests/test_health.py tests/test_sensor_adapters.py tests/test_db_repository.py",
+      "elapsedSeconds": 4.19,
+      "failed": 0,
+      "passed": 23,
+      "skipped": 0,
+      "warnings": 2
+    },
+    "focusedMvp": {
+      "command": "conda run --no-capture-output -n hack1 python -m pytest -q tests/test_ml_mvp_data.py tests/test_ml_mvp_logic.py",
+      "elapsedSeconds": 2.99,
+      "failed": 0,
+      "passed": 23,
+      "skipped": 0,
+      "warnings": 0
+    }
+  }
+}
