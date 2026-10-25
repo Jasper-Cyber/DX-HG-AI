@@ -7,7 +7,7 @@ const readings: Reading[] = Array.from({ length: 15 * 24 }, (_, i) => ({
   value: 60 + Math.floor(i / 24), quality: "ok", isSynthetic: true, scenario: "A",
 }));
 
-it("lets a user select a weekly scatter point and switch to monthly bars", () => {
+it("lets a user select a weekly scatter point and switch to monthly scatter points", () => {
   const screen = render(<HealthTrendDetails readings={readings} metric="hr" />);
   expect(screen.getByLabelText(/Weekly daily-average scatterplot/)).toBeTruthy();
   fireEvent.press(screen.getByLabelText(/Select 2026-01-08, daily average/));
@@ -20,6 +20,15 @@ it("lets a user select a weekly scatter point and switch to monthly bars", () =>
   fireEvent.press(screen.getByLabelText("Monthly trend"));
   expect(screen.queryByLabelText(/Weekly daily-average scatterplot/)).toBeNull();
   expect(screen.getByText("Daily averages · last 30 complete UTC days")).toBeTruthy();
+  expect(screen.getByLabelText(/Monthly daily-average scatterplot/)).toBeTruthy();
+  fireEvent.press(screen.getByLabelText(/Select 2026-01-01, daily average/));
+  expect(screen.getByLabelText(/2026-01-01: average/).props.accessibilityState.selected).toBe(true);
+  expect(screen.getByText("2026-01-01")).toBeTruthy();
+  expect(screen.queryByLabelText(/Select 2025-12-20, daily average/)).toBeNull();
+  fireEvent.press(screen.getByLabelText("2025-12-20: No data"));
+  expect(screen.getByText("2025-12-20")).toBeTruthy();
+  expect(screen.getByText("0 usable samples · bpm")).toBeTruthy();
+
   expect(screen.getByText("Not enough comparable history")).toBeTruthy();
 });
 
