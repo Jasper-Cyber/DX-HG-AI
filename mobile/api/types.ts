@@ -114,6 +114,7 @@ export interface RunAnalysisResponse {
 
 /** A compact alert row for the History past-alerts list. */
 export interface AlertSummary {
+  id?: number;
   state: AlertState;
   title: string;
   createdAt?: string;

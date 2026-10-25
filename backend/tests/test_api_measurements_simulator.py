@@ -93,3 +93,98 @@ def test_simulator_start_pause_reset(client):
 def test_simulator_invalid_action_422(client):
     c, _ = client
     assert c.post("/simulator/explode").status_code == 422
+
+
+def test_resume_and_tick_append_without_duplicates(client):
+    c, repo = client
+    from app.services.monitoring import tick
+
+    initial = c.post('/simulator/start').json()
+    first_count = repo.count_measurements()
+    assert initial['cursorTs'] == repo.get_sim_state().cursor_ts
+    # Repeated Start while running must be idempotent.
+    c.post('/simulator/start')
+    assert repo.count_measurements() == first_count
+    tick()
+    assert repo.count_measurements() == first_count + 6
+    c.post('/simulator/pause')
+    tick()
+    assert repo.count_measurements() == first_count + 6
+    resumed = c.post('/simulator/start').json()
+    assert resumed['cursorTs'] > initial['cursorTs']
+    rows = repo.query_measurements()
+    assert len(rows) == first_count + 12
+    assert len({(r.timestamp, r.metric_type) for r in rows}) == len(rows)
+    assert c.get('/insights/history').json()
+
+
+def test_analysis_replaces_stale_findings_and_reset_preserves_history(client):
+    c, repo = client
+    from app.db.models import AnomalyFinding
+
+    repo.insert_finding(AnomalyFinding(
+        metric_type='hr', finding_type='persistent_shift', severity_band='attention',
+        window_start='2026-01-01', window_end='2026-01-02', deviation=4,
+        supporting='{}',
+    ))
+    assert c.get('/insights', params={'persist': True}).json()['state'] == 'attention'
+    assert c.post('/analysis/run').json()['alertState'] == 'normal'
+    assert repo.list_findings() == []
+    c.post('/simulator/start')
+    count = len(c.get('/insights/history').json())
+    c.post('/simulator/reset')
+    assert c.get('/insights').json()['state'] == 'normal'
+    assert repo.list_findings() == []
+    assert repo.count_measurements() == 0
+    history = c.get('/insights/history').json()
+    assert len(history) == count + 1
+    assert any(a['state'] == 'attention' for a in history)
+    assert all(a['id'] and a['createdAt'] for a in history)
+    assert len(c.get('/insights/history', params={'limit': 1}).json()) == 1
+    assert c.get('/insights/history', params={'limit': 0}).status_code == 422
+
+
+def test_scenario_change_refreshes_readings_analysis_and_trends(client, monkeypatch):
+    c, repo = client
+    from app.services.simulator import SimulatorService
+
+    # A controlled irregular sequence exercises the warning path without
+    # depending on whether a random burst lands in the trailing detector window.
+    monkeypatch.setattr(SimulatorService, '_rhythm_flag',
+                        lambda self, scenario, offset, rng: float(scenario == 'C'))
+    c.post('/simulator/start')
+    c.post('/scenario', json={'scenario': 'C'})
+    assert all(r.scenario == 'C' for r in repo.query_measurements())
+    assert repo.list_findings(), 'Scenario C should be analyzed without a manual API call'
+    before = len(repo.list_findings())
+    c.post('/analysis/run')
+    assert len(repo.list_findings()) == before, 'Reanalysis must not accumulate findings'
+    c.post('/simulator/reset')
+    assert all(not s['points'] and s['baselineMean'] is None
+               for s in c.get('/trends').json()['series'])
+    assert c.get('/insights').json()['findings'] == []
+
+
+def test_background_worker_advances_and_stops(client, monkeypatch):
+    import asyncio
+    from app.services import monitoring
+
+    c, repo = client
+    c.post('/simulator/start')
+    count = repo.count_measurements()
+    monkeypatch.setattr(monitoring, 'INTERVAL_SECONDS', 0.01)
+    original_tick = monitoring.tick
+
+    async def exercise():
+        stop = asyncio.Event()
+        loop = asyncio.get_running_loop()
+
+        def one_tick():
+            original_tick()
+            loop.call_soon_threadsafe(stop.set)
+
+        monkeypatch.setattr(monitoring, 'tick', one_tick)
+        await asyncio.wait_for(monitoring.run(stop), timeout=10)
+
+    asyncio.run(exercise())
+    assert repo.count_measurements() == count + 6

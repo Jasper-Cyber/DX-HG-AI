@@ -30,7 +30,7 @@ export default function SimulatorScreen() {
       <SimulatedDataRibbon />
       <ScrollView contentContainerStyle={styles.content}>
         <Text style={styles.h1}>Simulator</Text>
-        <Text style={styles.sub}>Generate synthetic physiological data for the demo.</Text>
+        <Text style={styles.sub}>Generate synthetic physiological data for the demo. While running, one simulated hour advances every five seconds. Changing scenario starts a fresh dataset.</Text>
 
         {scenario.isLoading && !state ? (
           <View style={styles.centerCard}>

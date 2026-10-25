@@ -981,9 +981,8 @@ def run_analysis(*, user_id: int = DEMO_USER_ID) -> list[AnomalyFinding]:
     # Cross-signal guardrail (may downgrade + append a data_quality finding).
     findings = _apply_guardrail(findings, user_id=user_id)
 
-    # Persist everything; populate ids on the in-memory objects.
-    for f in findings:
-        f.id = repo.insert_finding(f)
+    # Publish only this run; old warnings must not survive a normal result.
+    repo.replace_findings(findings, user_id=user_id)
 
     return findings
 

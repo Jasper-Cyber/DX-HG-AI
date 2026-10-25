@@ -43,7 +43,7 @@ export default function EmergencyScreen() {
   const dispatch = useDispatch();
   const history = useDispatchHistory();
 
-  const [decision, setDecision] = useState<EmergencyDecision | null>(null);
+  const decision = evaluate.data?.enabled ? evaluate.data : null;
   const [confirming, setConfirming] = useState(false);
   const [lastResult, setLastResult] = useState<string | null>(null);
 
@@ -51,15 +51,18 @@ export default function EmergencyScreen() {
   const guidance = decision?.emergencyGuidance ?? "";
   const channel = decision?.channel ?? "simulated";
 
-  // Evaluate once location + settings are ready and the feature is enabled.
+  const { mutate: evaluateDecision, reset: resetEvaluation } = evaluate;
+  const retryEvaluation = () => evaluateDecision({
+    lat: location.lat, lon: location.lon, findingSummary,
+  });
+
   useEffect(() => {
-    if (!enabled || !location.resolved) return;
-    evaluate.mutate(
-      { lat: location.lat, lon: location.lon, findingSummary },
-      { onSuccess: (res) => setDecision(res.enabled ? res : null) },
-    );
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [enabled, location.resolved, findingSummary]);
+    setConfirming(false);
+    resetEvaluation();
+    if (!enabled || !location.resolved || careProfile.isPending) return;
+    evaluateDecision({ lat: location.lat, lon: location.lon, findingSummary });
+  }, [enabled, location.resolved, location.lat, location.lon, careProfile.isPending,
+      findingSummary, evaluateDecision, resetEvaluation]);
 
   const onConfirm = () => {
     // Dispatch with the SAME coordinates the decision was evaluated against, so
@@ -105,7 +108,16 @@ export default function EmergencyScreen() {
           </Text>
         </View>
 
-        {!enabled ? (
+        {settings.isError ? (
+          <View style={styles.card}>
+            <Text style={styles.disabledTitle}>Couldn’t load emergency settings</Text>
+            <Pressable onPress={() => settings.refetch()} accessibilityRole="button">
+              <Text style={styles.body}>Retry</Text>
+            </Pressable>
+          </View>
+        ) : settings.isPending ? (
+          <ActivityIndicator color={theme.colors.accent} />
+        ) : !enabled ? (
           <View style={styles.card}>
             <Text style={styles.disabledTitle}>Emergency dispatch is off</Text>
             <Text style={styles.body}>
@@ -113,14 +125,22 @@ export default function EmergencyScreen() {
               The static guidance above always applies.
             </Text>
           </View>
-        ) : location.loading || evaluate.isPending ? (
+        ) : evaluate.isError ? (
+          <View style={styles.card}>
+            <Text style={styles.disabledTitle}>Unable to evaluate emergency routing</Text>
+            <Text style={styles.body}>{(evaluate.error as Error).message}</Text>
+            <Pressable onPress={retryEvaluation} accessibilityRole="button">
+              <Text style={styles.body}>Retry evaluation</Text>
+            </Pressable>
+          </View>
+        ) : location.loading || careProfile.isPending || evaluate.isPending ? (
           <ActivityIndicator color={theme.colors.accent} style={styles.loader} />
         ) : decision && decision.recipientName ? (
           <DecisionPreview decision={decision} approximate={location.approximate} onStart={() => setConfirming(true)} />
         ) : (
           <View style={styles.card}>
             <Text style={styles.body}>
-              No dispatch is recommended right now. The guidance above still applies.
+              No routing decision is available. The guidance above still applies.
             </Text>
           </View>
         )}
@@ -134,12 +154,19 @@ export default function EmergencyScreen() {
         <Text style={styles.h2}>Dispatch history</Text>
         {history.isLoading ? (
           <ActivityIndicator color={theme.colors.accent} />
+        ) : history.isError ? (
+          <View style={styles.card}>
+            <Text style={styles.body}>Couldn’t load dispatch history.</Text>
+            <Pressable onPress={() => history.refetch()} accessibilityRole="button">
+              <Text style={styles.body}>Retry history</Text>
+            </Pressable>
+          </View>
         ) : (
           <DispatchHistoryList events={history.data ?? []} />
         )}
       </ScrollView>
 
-      {decision && decision.recipientName ? (
+      {enabled && !evaluate.isPending && !evaluate.isError && decision && decision.recipientName ? (
         <EmergencyConfirmDialog
           visible={confirming}
           recipientName={decision.recipientName}

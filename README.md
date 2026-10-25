@@ -108,6 +108,15 @@ npm start          # scan the QR with Expo Go, or press w for web, a/i for emula
 The app opens to a dark-blue dashboard with a persistent "SIMULATED DATA" ribbon.
 Run mobile tests with `npm test`.
 
+Starting a fresh simulator run creates three weeks of hourly synthetic history and
+analyzes it immediately. While running, the backend appends one simulated hour every
+five seconds and refreshes analysis; mobile readings, trends, insights, and alert
+history poll for updates. Pause freezes generation; Start resumes at the saved cursor.
+Reset clears readings and current analysis but preserves saved alert history. Selecting
+a different scenario starts a fresh dataset (and continues running if already active).
+The accelerated demo uses a deterministic January 1, 2026 starting point.
+Run one Uvicorn worker for this local demo: its scheduler and control lock are in-process.
+
 > **Networking:** the app calls the backend at `http://localhost:8000`. On a physical phone, set
 > the API base URL to your computer's LAN IP (see `mobile/api/`), since `localhost` on the phone
 > refers to the phone itself.
@@ -124,7 +133,8 @@ Run mobile tests with `npm test`.
 | POST | `/simulator/{start\|pause\|reset}` | Control the simulator (start generates data) |
 | POST | `/analysis/run` | Recompute baselines + findings, refresh the alert |
 | GET | `/trends?range=daily\|weekly\|monthly` | Aggregated trend series + baseline |
-| GET | `/insights` | Current alert state + history |
+| GET | `/insights` | Current alert state and supporting findings |
+| GET | `/insights/history?limit=100` | Saved alert snapshots, newest first |
 | GET/PUT | `/settings` | Feature flags (warnings / suggestions / emergency) |
 | POST | `/settings/disclaimer-ack` | Record disclaimer acknowledgement |
 | GET/PUT | `/care/profile` | Care profile + emergency contacts |

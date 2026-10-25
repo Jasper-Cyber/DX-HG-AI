@@ -19,7 +19,7 @@ export function PastAlertsList({ alerts }: PastAlertsListProps) {
       {alerts.map((a, i) => {
         const meta = alertStateMeta(a.state);
         return (
-          <View key={i} style={styles.row}>
+          <View key={a.id ?? i} style={styles.row}>
             <View style={[styles.dot, { backgroundColor: meta.color }]} />
             <View style={styles.rowText}>
               <Text style={styles.title}>{a.title || meta.defaultTitle}</Text>

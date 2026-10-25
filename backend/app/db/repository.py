@@ -207,8 +207,32 @@ def insert_finding(f: AnomalyFinding) -> int:
         return int(cur.lastrowid)
 
 
+def clear_current_analysis(*, user_id: int = DEMO_USER_ID) -> None:
+    """Clear derived state for a reset, preserving historical alert snapshots."""
+    with get_connection() as conn:
+        conn.execute("DELETE FROM anomaly_findings WHERE user_id = ?", (user_id,))
+        conn.execute("DELETE FROM baselines WHERE user_id = ?", (user_id,))
+
+
+def replace_findings(findings: list[AnomalyFinding], *, user_id: int = DEMO_USER_ID) -> None:
+    """Atomically publish the current analysis, including an empty result."""
+    with get_connection() as conn:
+        conn.execute("DELETE FROM anomaly_findings WHERE user_id = ?", (user_id,))
+        for f in findings:
+            cur = conn.execute(
+                """INSERT INTO anomaly_findings
+                (user_id, metric_type, finding_type, severity_band, window_start,
+                 window_end, deviation, supporting, created_at)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)""",
+                (user_id, f.metric_type, f.finding_type, f.severity_band,
+                 f.window_start, f.window_end, f.deviation, f.supporting,
+                 f.created_at or utc_now_iso()),
+            )
+            f.id = int(cur.lastrowid)
+
+
 def list_findings(*, user_id: int = DEMO_USER_ID, limit: Optional[int] = None) -> list[AnomalyFinding]:
-    sql = "SELECT * FROM anomaly_findings WHERE user_id = ? ORDER BY created_at DESC"
+    sql = "SELECT * FROM anomaly_findings WHERE user_id = ? ORDER BY created_at DESC, id DESC"
     params: list[object] = [user_id]
     if limit is not None:
         sql += " LIMIT ?"
@@ -256,7 +280,7 @@ def latest_alert(*, user_id: int = DEMO_USER_ID) -> Optional[Alert]:
 
 
 def list_alerts(*, user_id: int = DEMO_USER_ID, limit: Optional[int] = None) -> list[Alert]:
-    sql = "SELECT * FROM alerts WHERE user_id = ? ORDER BY created_at DESC"
+    sql = "SELECT * FROM alerts WHERE user_id = ? ORDER BY created_at DESC, id DESC"
     params: list[object] = [user_id]
     if limit is not None:
         sql += " LIMIT ?"

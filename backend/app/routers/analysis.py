@@ -12,11 +12,9 @@ from fastapi import APIRouter, HTTPException, Query
 from pydantic import BaseModel
 
 from ..db import repository as repo
-from ..services.alerts import AlertService
 from ..services.analysis import NUMERIC_METRICS
 
 router = APIRouter(tags=["analysis"])
-_alerts = AlertService()
 
 _RANGE_RULE = {"daily": "D", "weekly": "W", "monthly": "ME"}
 
@@ -30,7 +28,9 @@ class RunResponse(BaseModel):
 @router.post("/analysis/run", response_model=RunResponse)
 def run_analysis() -> RunResponse:
     """Recompute analysis and refresh the alert. Returns a short summary."""
-    alert = _alerts.evaluate_and_store(run_analysis=True)
+    from ..services.monitoring import refresh
+
+    alert = refresh()
     findings = repo.list_findings()
     return RunResponse(findingsCount=len(findings), alertState=alert.state)
 

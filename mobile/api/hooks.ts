@@ -17,6 +17,7 @@ import {
 
 import { api } from "./client";
 import type {
+  AlertSummary,
   CareProfile,
   DispatchArgs,
   DispatchEvent,
@@ -44,6 +45,7 @@ export const queryKeys = {
     ["measurements", params ?? {}] as const,
   trends: (range: TrendRange) => ["trends", range] as const,
   insights: ["insights"] as const,
+  alertHistory: ["alertHistory"] as const,
   scenario: ["scenario"] as const,
   careProfile: ["careProfile"] as const,
   providers: (params: { lat: number; lon: number; emergency?: boolean }) =>
@@ -72,6 +74,7 @@ export function useScenario(): UseQueryResult<ScenarioState> {
   return useQuery({
     queryKey: queryKeys.scenario,
     queryFn: ({ signal }) => api.getScenario(signal),
+    refetchInterval: LIVE_POLL_INTERVAL_MS,
   });
 }
 
@@ -87,9 +90,11 @@ export function useMeasurements(
 }
 
 export function useTrends(range: TrendRange): UseQueryResult<TrendsResponse> {
+  const pollInterval = useLivePollInterval();
   return useQuery({
     queryKey: queryKeys.trends(range),
     queryFn: ({ signal }) => api.getTrends(range, signal),
+    refetchInterval: pollInterval,
   });
 }
 
@@ -98,6 +103,15 @@ export function useInsights(): UseQueryResult<InsightResponse> {
   return useQuery({
     queryKey: queryKeys.insights,
     queryFn: ({ signal }) => api.getInsights(signal),
+    refetchInterval: pollInterval,
+  });
+}
+
+export function useAlertHistory(): UseQueryResult<AlertSummary[]> {
+  const pollInterval = useLivePollInterval();
+  return useQuery({
+    queryKey: queryKeys.alertHistory,
+    queryFn: ({ signal }) => api.getAlertHistory(signal),
     refetchInterval: pollInterval,
   });
 }
@@ -147,6 +161,8 @@ export function useSetScenario(): UseMutationResult<ScenarioState, unknown, Scen
       qc.setQueryData(queryKeys.scenario, state);
       void qc.invalidateQueries({ queryKey: ["measurements"] });
       void qc.invalidateQueries({ queryKey: queryKeys.insights });
+      void qc.invalidateQueries({ queryKey: queryKeys.alertHistory });
+      void qc.invalidateQueries({ queryKey: ["trends"] });
     },
   });
 }
@@ -166,6 +182,8 @@ export function useSimulatorControl(): UseMutationResult<ScenarioState, unknown,
       qc.setQueryData(queryKeys.scenario, state);
       void qc.invalidateQueries({ queryKey: ["measurements"] });
       void qc.invalidateQueries({ queryKey: queryKeys.insights });
+      void qc.invalidateQueries({ queryKey: queryKeys.alertHistory });
+      void qc.invalidateQueries({ queryKey: ["trends"] });
     },
   });
 }
@@ -179,6 +197,7 @@ export function useRunAnalysis(): UseMutationResult<RunAnalysisResponse, unknown
     // and trends so screens pick up the recomputed state.
     onSuccess: () => {
       void qc.invalidateQueries({ queryKey: queryKeys.insights });
+      void qc.invalidateQueries({ queryKey: queryKeys.alertHistory });
       void qc.invalidateQueries({ queryKey: ["trends"] });
     },
   });
