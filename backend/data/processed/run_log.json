@@ -1,0 +1,79 @@
+{
+  "schema": "ml_mvp_run_log/v1",
+  "task": "1.1 Build the isolated ECG data pipeline and provenance artifacts",
+  "status": "completed",
+  "startedAtUtc": "2026-10-25T10:11:31.1290388Z",
+  "completedAtUtc": "2026-10-25T10:21:24.9857558Z",
+  "totalElapsedSeconds": 593.857,
+  "startingCommit": "c2083a181b0d7077e8a9029556e70236271cf87b",
+  "branch": "feat/stroke-ecg-motion",
+  "environment": {
+    "condaExecutable": "C:\\Users\\RAFF\\Applications\\miniconda3\\Scripts\\conda.exe",
+    "environment": "hack1",
+    "pythonExecutable": "C:\\Users\\RAFF\\Applications\\miniconda3\\envs\\hack1\\python.exe",
+    "verified": true
+  },
+  "baseline": {
+    "command": "conda run --no-capture-output -n hack1 python -m pytest -q tests/test_health.py tests/test_sensor_adapters.py tests/test_db_repository.py",
+    "elapsedSeconds": 4.155,
+    "passed": 23,
+    "failed": 0,
+    "skipped": 0,
+    "failingTests": []
+  },
+  "stages": [
+    {
+      "name": "acquire",
+      "result": "passed",
+      "elapsedSeconds": 11.781,
+      "downloadedOrReusedBytes": 99303574,
+      "sourceUsed": "PhysioNet labels plus official physionet-open S3 archive mirror",
+      "note": "The primary PhysioNet archive connection stalled at zero bytes and was stopped; the official open-data mirror completed within the checkpoint."
+    },
+    {
+      "name": "select_preprocess_split",
+      "result": "passed",
+      "elapsedSeconds": 2.392,
+      "rows": 1000,
+      "normal": 700,
+      "af": 300,
+      "deadlineReached": false
+    },
+    {
+      "name": "write_artifacts",
+      "result": "passed",
+      "elapsedSeconds": 0.274
+    },
+    {
+      "name": "determinism_check",
+      "result": "passed",
+      "command": "conda run --no-capture-output -n hack1 python -m ml_mvp.pipeline",
+      "cohortSha256First": "bf27e08e40b1538f6223dc6de85c8c4bb4f4fb3190afc30871cd4ed82a4a19a8",
+      "cohortSha256Second": "bf27e08e40b1538f6223dc6de85c8c4bb4f4fb3190afc30871cd4ed82a4a19a8",
+      "splitSha256First": "6c6c4cea18e9247df71a382287ee51e58a998a5afd9b2e7392eacd361bd9f731",
+      "splitSha256Second": "6c6c4cea18e9247df71a382287ee51e58a998a5afd9b2e7392eacd361bd9f731"
+    },
+    {
+      "name": "self_check",
+      "result": "passed",
+      "command": "conda run --no-capture-output -n hack1 python -m ml_mvp.pipeline --check",
+      "rows": 1000,
+      "classCounts": {"N": 700, "A": 300},
+      "splitCounts": {"train": 700, "validation": 150, "test": 150}
+    },
+    {
+      "name": "post_change_smoke",
+      "result": "passed",
+      "command": "conda run --no-capture-output -n hack1 python -m pytest -q tests/test_health.py tests/test_sensor_adapters.py tests/test_db_repository.py",
+      "elapsedSeconds": 4.303,
+      "passed": 23,
+      "failed": 0,
+      "skipped": 0,
+      "failingTests": []
+    }
+  ],
+  "achievedClassCounts": {"N": 700, "A": 300},
+  "splitCounts": {"train": 700, "validation": 150, "test": 150},
+  "targetReached": true,
+  "blockers": []
+}

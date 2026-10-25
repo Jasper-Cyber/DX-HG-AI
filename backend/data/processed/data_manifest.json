@@ -1,0 +1,92 @@
+{
+  "files": [
+    {
+      "bytes": 4673181,
+      "classCounts": {
+        "A": 300,
+        "N": 700
+      },
+      "path": "processed/cinc2017_cohort.npz",
+      "rows": 1000,
+      "sha256": "bf27e08e40b1538f6223dc6de85c8c4bb4f4fb3190afc30871cd4ed82a4a19a8"
+    },
+    {
+      "bytes": 16515,
+      "path": "processed/split_manifest.json",
+      "rows": 1000,
+      "sha256": "6c6c4cea18e9247df71a382287ee51e58a998a5afd9b2e7392eacd361bd9f731"
+    }
+  ],
+  "limitations": [
+    "CinC 2017 labels cardiac rhythm rather than stroke and contains no paired stroke-onset outcome.",
+    "Published patient IDs are unavailable; record-level grouping is an MVP assumption.",
+    "A first 10-second record window is not longitudinal evidence.",
+    "Demographic and device metadata are insufficient for subgroup bias analysis."
+  ],
+  "preprocessing": {
+    "bandpassHz": [
+      0.5,
+      40.0
+    ],
+    "bandpassOrder": 4,
+    "inputFsHz": 300,
+    "resampleFsHz": 125,
+    "storage": "float32 mV",
+    "windowRule": "first full valid window per record",
+    "windowSamples": 1250,
+    "windowSeconds": 10,
+    "zeroPhase": true
+  },
+  "schema": "ml_mvp_data_manifest/v1",
+  "seed": 42,
+  "selection": {
+    "achievedClassCounts": {
+      "A": 300,
+      "N": 700
+    },
+    "achievedRows": 1000,
+    "excludedRecordCounts": {
+      "missingArchiveMember": 0,
+      "noisyLabel": 279,
+      "otherLabel": 2415,
+      "shorterThan10Seconds": 2,
+      "unusableSignalOrHeader": 0
+    },
+    "shortfallReason": null,
+    "splitCounts": {
+      "test": 150,
+      "train": 700,
+      "validation": 150
+    },
+    "targetClassCounts": {
+      "A": 300,
+      "N": 700
+    },
+    "targetReached": true
+  },
+  "source": {
+    "accessDate": "2026-10-25",
+    "archiveMirrorUrl": "https://physionet-open.s3.amazonaws.com/challenge-2017/1.0.0/training2017.zip",
+    "archiveUrl": "https://physionet.org/files/challenge-2017/1.0.0/training2017.zip",
+    "citationUrl": "https://physionet.org/content/challenge-2017/1.0.0/#citation",
+    "dataset": "PhysioNet/CinC Challenge 2017",
+    "isSynthetic": false,
+    "labelsUrl": "https://physionet.org/files/challenge-2017/1.0.0/REFERENCE-v3.csv",
+    "license": "No explicit dataset license statement found on the source page; verify terms before redistribution",
+    "licenseUrl": "https://physionet.org/content/challenge-2017/1.0.0/",
+    "rawFiles": {
+      "REFERENCE-v3.csv": {
+        "bytes": 76752,
+        "sha256": "ae517e474b0bc89a7517ad876b5b4dadc6c94f680d0665c04746db9432df855b",
+        "url": "https://physionet.org/files/challenge-2017/1.0.0/REFERENCE-v3.csv"
+      },
+      "training2017.zip": {
+        "bytes": 99226822,
+        "sha256": "25fdbab36bb6724b66a4d2c26ff89f6b9d6ff87e6aed714d24cf5bf071cd1255",
+        "url": "https://physionet-open.s3.amazonaws.com/challenge-2017/1.0.0/training2017.zip"
+      }
+    },
+    "sourceUrl": "https://physionet.org/content/challenge-2017/1.0.0/",
+    "version": "1.0.0"
+  }
+}

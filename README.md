@@ -5,12 +5,14 @@ demonstrates how wearable physiological data can be continuously analyzed to sur
 personalized health trends and explainable, non-diagnostic alerts.
 
 > ⚠️ **Experimental prototype — not a medical device.**
-> All physiological data is **synthetic** and labeled experimental. The app does not diagnose
-> conditions, makes no guarantee of accuracy, reliability, or timeliness, and is **not responsible
-> for false alarms or missed events**. Any decision to act on a warning — including whether to
-> enable warnings, contact anyone, or trigger a dispatch — is solely the user's decision. For real
-> medical needs, contact a qualified professional or your local emergency services. This notice is
-> a product disclaimer, not legal advice.
+> The existing mobile simulator's physiological values are **synthetic**. The isolated ECG + motion
+> CLI uses selected windows from real public PhysioNet CinC 2017 and UCI HAPT datasets; the
+> streams come from different people and are paired only for a deterministic fusion demo.
+> All outputs are labeled experimental. The project does not diagnose conditions, makes no guarantee
+> of accuracy, reliability, or timeliness, and is **not responsible for false alarms or missed events**.
+> Any decision to act on a warning — including whether to enable warnings, contact anyone, or trigger
+> a dispatch — is solely the user's decision. For real medical needs, contact a qualified professional
+> or your local emergency services. This notice is a product disclaimer, not legal advice.
 
 ---
 
@@ -29,7 +31,34 @@ personalized health trends and explainable, non-diagnostic alerts.
   providers on a warning, and an **opt-in, simulated-by-default** emergency dispatch flow.
 - **Experimental disclaimer** acknowledged on first launch and always accessible from Settings.
 
-Everything runs locally with no real sensors and no paid APIs.
+The mobile prototype runs locally with no real sensors or paid APIs. The isolated CLI replays locally stored public-data windows and does not call a server.
+
+## One-hour ECG + motion MVP
+
+This repository also contains an isolated, non-production experiment under `backend/ml_mvp/`. It extracts deterministic HRV features from real PhysioNet CinC 2017 ECG windows, applies transparent UCI HAPT motion rules, and demonstrates motion-gated fusion in three CLI personas.
+
+From `backend/`, use the required Conda environment:
+
+```powershell
+conda run --no-capture-output -n hack1 python -m ml_mvp.pipeline --check
+conda run --no-capture-output -n hack1 python -m ml_mvp.demo --persona healthy --countdown-seconds 0.2
+conda run --no-capture-output -n hack1 python -m ml_mvp.demo --persona possible_acute_event --countdown-seconds 0.2
+conda run --no-capture-output -n hack1 python -m ml_mvp.demo --persona false_alarm --countdown-seconds 0.2
+```
+
+Expected outcomes: `healthy` ends without a Warning; `possible_acute_event` follows Normal → Watch → Warning and prints an explicitly simulated-only escalation; `false_alarm` excludes artifact-paired ECG and raises no Warning. The 0.2-second CLI countdown is a short demo setting; its documented production analogue is 30 seconds. It never dispatches, sends HTTP, or issues notifications.
+
+Data and claim boundaries:
+
+- ECG: 1,000 real CinC 2017 records (700 Normal/300 AF), split by record 700/150/150. CinC labels rhythm rather than stroke and publishes no patient IDs, so record-as-patient is an MVP assumption.
+- Motion: eight real UCI HAPT waist-smartphone laboratory windows from one subject; this bounded fixture is not wrist/free-living validation.
+- ECG and motion come from different people/datasets. No paired actual stroke-onset dataset is used.
+- The output is experimental and non-diagnostic; it detects AF-like rhythm patterns, not stroke.
+- Exact provenance and hashes: `backend/data/README.md`; measured results: `docs/MVP_EVALUATION.md`; demo script: `docs/DEMO.md`.
+
+The existing backend endpoints are unauthenticated and intended only for local prototype use. No `/stroke/*` endpoint is implemented in this MVP.
+
+Deferred roadmap: full external/robustness evaluation; CNN-LSTM and ONNX runtime; `/stroke/*`; persistent warning/database integration; full mobile warning/history UI; a synthetic-only demo DB snapshot; and a disabled interface placeholder for a future local/on-device LLM explainer. The teammate-owned mobile UI was not edited for this MVP.
 
 ---
 
@@ -187,17 +216,14 @@ Place demo screenshots in `docs/screenshots/` and reference them here, e.g.:
 ## Safety & privacy
 
 - No credentials or API keys in the client; the backend reads config from env / local files.
-- All data is synthetic; the local SQLite file holds no real patient information.
-- Warnings, provider suggestions, and emergency dispatch are **optional and user-controlled**;
-  suggestions and emergency default **off**.
-- Emergency dispatch is **simulated by default** and never sends anything without explicit
-  confirmation. A real channel requires an opt-in config flag and a working notifier adapter.
+- Existing mobile simulator/personal data is synthetic; the local SQLite file holds no real patient information. The isolated CLI reads only committed public-data fixtures and stores no personal identity.
+- Warnings, provider suggestions, and emergency dispatch in the existing mobile prototype are **optional and user-controlled**; suggestions and emergency default **off**.
+- Existing app emergency dispatch is simulated by default; a real channel requires an opt-in flag, explicit confirmation, and a working notifier adapter. The isolated MVP's countdown expiry only records/prints `SIMULATED escalation` and never sends anything.
 - All medical-adjacent output is labeled experimental and does not replace professional evaluation.
 
 ## Development
 
-Built with Amazon Kiro using spec-driven development. The requirements, design, and task plan live
-in `.kiro/specs/heartguardian-ai/`. See `TEAM.md` for ownership and the branch-per-task workflow.
+Built with Amazon Kiro using spec-driven development. The original application spec lives in `.kiro/specs/heartguardian-ai/`; the isolated MVP requirements, design, and task plan live in `.kiro/specs/stroke-risk-ecg-motion/`. See `TEAM.md` for the existing application ownership and branch-per-task workflow.
 
 ### Trend exploration
 
@@ -223,3 +249,7 @@ scatter view compares the latest seven complete days against the preceding seven
 requiring at least five valid daily entries per period. Startup adds this new metric
 to existing synthetic demo history without changing its original readings. No real
 VO₂ max sensor or clinical estimation model is connected.
+
+## Data and analysis (for the presentation)
+
+The ECG + motion experiment uses real public data (1,000 PhysioNet CinC 2017 ECG records, 700 Normal / 300 AF, plus real UCI HAPT motion windows). It is a CLI-only, non-diagnostic MVP on branch `feat/stroke-ecg-motion`. Everything a presenter needs (data, results, how to run, troubleshooting, honest limits) is in **[docs/DATA_AND_ANALYSIS.md](docs/DATA_AND_ANALYSIS.md)**.

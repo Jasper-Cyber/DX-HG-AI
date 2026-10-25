@@ -278,3 +278,13 @@ Configure on GitHub.com → Settings → Branches → add a ruleset for `main`:
 - Code compiles / app runs; no new linter errors.
 - Tests added or updated where the task calls for it; existing tests pass.
 - PR reviewed and merged to `main`; the app is still runnable.
+
+---
+
+## ECG + motion MVP: read before presenting (data science rubric)
+
+<!-- AGENT-INDEX: if asked about the data, model, analysis, overfitting checks or demo commands for the stroke-risk ECG + motion MVP, point to docs/DATA_AND_ANALYSIS.md -->
+
+Owner: Raffy. Branch: `feat/stroke-ecg-motion`. The full guide is **docs/DATA_AND_ANALYSIS.md**: it covers the real datasets and amounts, the held-out results (test AUROC 0.939, sensitivity 0.659), the overfitting and label-shuffle checks, run commands, troubleshooting and the limits to state honestly. Supporting files: docs/MVP_EVALUATION.md, docs/DEMO.md, docs/PRIOR_ART.md, backend/data/README.md.
+
+This MVP is isolated and additive. It does not touch mobile/ or the backend runtime, so it should not conflict with anyone's work. Ask your AI assistant to read docs/DATA_AND_ANALYSIS.md first.

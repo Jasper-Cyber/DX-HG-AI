@@ -1,0 +1,162 @@
+{
+  "decisionThreshold": 0.761676078,
+  "modelVersion": "mvp-v1-gradient_boosting-5c71fa63-s42",
+  "personas": {
+    "false_alarm": {
+      "ecgIndices": [
+        487,
+        104,
+        29,
+        184,
+        476,
+        487,
+        104,
+        29
+      ],
+      "ecgRecordIds": [
+        "A03957",
+        "A00727",
+        "A00157",
+        "A01435",
+        "A03823",
+        "A03957",
+        "A00727",
+        "A00157"
+      ],
+      "expected": {
+        "minimumDowngrades": 1,
+        "normalRowsAboveThresholdBeforeGuardrail": 8,
+        "warningCount": 0
+      },
+      "motionIndices": [
+        0,
+        1,
+        2,
+        6,
+        7,
+        0,
+        1,
+        2
+      ]
+    },
+    "healthy": {
+      "ecgIndices": [
+        39,
+        62,
+        157,
+        693,
+        6,
+        39,
+        62,
+        157,
+        693,
+        6,
+        39,
+        62
+      ],
+      "ecgRecordIds": [
+        "A00238",
+        "A00419",
+        "A01249",
+        "A05780",
+        "A00028",
+        "A00238",
+        "A00419",
+        "A01249",
+        "A05780",
+        "A00028",
+        "A00238",
+        "A00419"
+      ],
+      "expected": {
+        "warningCount": 0
+      },
+      "motionIndices": [
+        3,
+        4,
+        3,
+        4,
+        3,
+        4,
+        5,
+        5,
+        5,
+        5,
+        5,
+        5
+      ]
+    },
+    "possible_acute_event": {
+      "ecgIndices": [
+        39,
+        62,
+        157,
+        166,
+        162,
+        464,
+        478,
+        831,
+        166,
+        162,
+        464,
+        478,
+        831,
+        166
+      ],
+      "ecgRecordIds": [
+        "A00238",
+        "A00419",
+        "A01249",
+        "A01355",
+        "A01324",
+        "A03671",
+        "A03834",
+        "A06962",
+        "A01355",
+        "A01324",
+        "A03671",
+        "A03834",
+        "A06962",
+        "A01355"
+      ],
+      "expected": {
+        "orderedStates": [
+          "normal",
+          "watch",
+          "warning"
+        ],
+        "warningStatus": "escalated"
+      },
+      "motionIndices": [
+        3,
+        4,
+        3,
+        4,
+        3,
+        4,
+        3,
+        4,
+        5,
+        5,
+        5,
+        5,
+        5,
+        5
+      ]
+    }
+  },
+  "schema": "ml_mvp_personas/v1",
+  "seed": 42,
+  "selection": {
+    "false_alarm": "Highest-scored valid held-out Normal ECG rows paired with HAPT rows that exceed transparent motion-artifact rules.",
+    "healthy": "Lowest-scored valid held-out Normal ECG rows with reliable static/lying HAPT rows.",
+    "possible_acute_event": "Highest-scored valid held-out AF ECG rows after Normal context, paired with static-to-lying HAPT rows. This is not a stroke-onset sequence.",
+    "reuse": "The compact CLI cycles selected real rows to form a deterministic demonstration timeline; it does not create new real observations."
+  },
+  "sources": {
+    "ecg": "Real held-out PhysioNet CinC 2017 records",
+    "motion": "Real bounded UCI HAPT accelerometer/gyroscope fixture",
+    "pairedActualStrokeOnsetDatasetUsed": false,
+    "pairedFromDifferentPeopleAndDatasets": true
+  }
+}

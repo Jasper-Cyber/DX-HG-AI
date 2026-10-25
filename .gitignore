@@ -125,3 +125,9 @@ yarn-error.*
 Thumbs.db
 .cursorignore
 .cursorindexingignore
+
+# ============================================================
+# Stroke-risk ECG + motion MVP
+# ============================================================
+backend/data/raw/
+backend/data/**/*.part

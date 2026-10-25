@@ -1,0 +1,77 @@
+{
+  "pbtResults": {},
+  "executionHistory": {
+    "1.1 Build the isolated ECG data pipeline and provenance artifacts (estimated: 18 minutes; cumulative: 18 minutes)": [
+      {
+        "executionId": "6eda0cb3-7d0b-4008-b9e8-eb27ee27a459",
+        "chatSessionId": "sess_2b4ab550-5e44-4de5-97ad-5b98c927ed1c",
+        "timestamp": 1792922611176
+      },
+      {
+        "executionId": "6eda0cb3-7d0b-4008-b9e8-eb27ee27a459",
+        "chatSessionId": "sess_2b4ab550-5e44-4de5-97ad-5b98c927ed1c",
+        "timestamp": 1792922615214
+      },
+      {
+        "executionId": "6eda0cb3-7d0b-4008-b9e8-eb27ee27a459",
+        "chatSessionId": "sess_2b4ab550-5e44-4de5-97ad-5b98c927ed1c",
+        "timestamp": 1792923748858
+      }
+    ],
+    "2.1 Build and exercise the complete non-production MVP demo path (estimated: 22 minutes; cumulative: 40 minutes)": [
+      {
+        "executionId": "6eda0cb3-7d0b-4008-b9e8-eb27ee27a459",
+        "chatSessionId": "sess_2b4ab550-5e44-4de5-97ad-5b98c927ed1c",
+        "timestamp": 1792922611565
+      },
+      {
+        "executionId": "6eda0cb3-7d0b-4008-b9e8-eb27ee27a459",
+        "chatSessionId": "sess_2b4ab550-5e44-4de5-97ad-5b98c927ed1c",
+        "timestamp": 1792923754615
+      },
+      {
+        "executionId": "6eda0cb3-7d0b-4008-b9e8-eb27ee27a459",
+        "chatSessionId": "sess_2b4ab550-5e44-4de5-97ad-5b98c927ed1c",
+        "timestamp": 1792924287490
+      }
+    ],
+    "3.1 Test, document, clean, and commit the MVP without exceeding 60 minutes (estimated: 15 minutes; cumulative: 55 minutes)": [
+      {
+        "executionId": "6eda0cb3-7d0b-4008-b9e8-eb27ee27a459",
+        "chatSessionId": "sess_2b4ab550-5e44-4de5-97ad-5b98c927ed1c",
+        "timestamp": 1792922611690
+      },
+      {
+        "executionId": "6eda0cb3-7d0b-4008-b9e8-eb27ee27a459",
+        "chatSessionId": "sess_2b4ab550-5e44-4de5-97ad-5b98c927ed1c",
+        "timestamp": 1792924292200
+      },
+      {
+        "executionId": "6eda0cb3-7d0b-4008-b9e8-eb27ee27a459",
+        "chatSessionId": "sess_2b4ab550-5e44-4de5-97ad-5b98c927ed1c",
+        "timestamp": 1792924633728
+      }
+    ],
+    "1. Establish the branch, environment, baseline, and compact real-data foundation": [
+      {
+        "executionId": "6eda0cb3-7d0b-4008-b9e8-eb27ee27a459",
+        "chatSessionId": "sess_2b4ab550-5e44-4de5-97ad-5b98c927ed1c",
+        "timestamp": 1792923748951
+      }
+    ],
+    "2. Implement the lightweight model, real-motion rules, pure fusion, and CLI personas": [
+      {
+        "executionId": "6eda0cb3-7d0b-4008-b9e8-eb27ee27a459",
+        "chatSessionId": "sess_2b4ab550-5e44-4de5-97ad-5b98c927ed1c",
+        "timestamp": 1792924287592
+      }
+    ],
+    "3. Add focused tests and truthful docs, enforce the time box, validate, and commit locally": [
+      {
+        "executionId": "6eda0cb3-7d0b-4008-b9e8-eb27ee27a459",
+        "chatSessionId": "sess_2b4ab550-5e44-4de5-97ad-5b98c927ed1c",
+        "timestamp": 1792924633825
+      }
+    ]
+  }
+}
